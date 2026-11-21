@@ -5,7 +5,25 @@ import { DormAction, DormState, ROOMMATE_IDS, RoommateId } from '../types/dorm';
 
 export type SyncMode = 'local' | 'lan';
 
+export type ViewMode = 'director' | 'quad' | 'single';
+
 export type ConnectionStatus = 'standalone' | 'connecting' | 'connected' | 'offline_fallback';
+
+export function parseInitialViewMode(): ViewMode {
+  if (typeof window !== 'undefined') {
+    const params = new URLSearchParams(window.location.search);
+    const viewParam = params.get('view');
+    if (viewParam === 'quad' || viewParam === 'single' || viewParam === 'director') {
+      return viewParam;
+    }
+    const injected = (window as unknown as { __INITIAL_VIEW_MODE__?: string })
+      .__INITIAL_VIEW_MODE__;
+    if (injected === 'quad' || injected === 'single' || injected === 'director') {
+      return injected;
+    }
+  }
+  return 'director';
+}
 
 export interface LanPresenceInfo {
   connectedClients: number;
@@ -73,6 +91,10 @@ export function parseUrlBootParams(): UrlBootParams {
   };
 }
 
+function isFileProtocol(): boolean {
+  return typeof window !== 'undefined' && window.location.protocol === 'file:';
+}
+
 function buildFallbackLanInfo(wsPort: number): LanServerInfo {
   const host =
     typeof window !== 'undefined' && window.location.hostname
@@ -83,7 +105,10 @@ function buildFallbackLanInfo(wsPort: number): LanServerInfo {
       ? Number(window.location.port)
       : 5173;
   const origin =
-    typeof window !== 'undefined'
+    typeof window !== 'undefined' &&
+    !isFileProtocol() &&
+    window.location.origin &&
+    window.location.origin !== 'null'
       ? window.location.origin
       : `http://${host}:${webPort}`;
 
@@ -140,10 +165,10 @@ export function useDormSyncController() {
 
   const fetchLanServerInfo = useCallback(async (): Promise<LanServerInfo | null> => {
     if (typeof window === 'undefined') return null;
-    const host = window.location.hostname || 'localhost';
+    const host = window.location.hostname || '127.0.0.1';
     const currentWebPort = window.location.port || '5173';
     const controller = new AbortController();
-    const timer = window.setTimeout(() => controller.abort(), 1500);
+    const timer = window.setTimeout(() => controller.abort(), 1200);
 
     try {
       const resp = await fetch(
@@ -166,13 +191,19 @@ export function useDormSyncController() {
     }
   }, [boot.wsPort]);
 
-  // 初次探测局域网同步服务：若在线且未强制指定 local，自动就绪/连接局域网实时同步；若离线则零报错保持纯本地导播模式
+  // 初次探测局域网同步服务：
+  // - HTTP/HTTPS 下若探测到 :5174 在线且未强制指定 local，自动进入局域网联机同步；
+  // - file:// 双击即玩模式下默认稳居「单机剧本导播模式」（同时静默探测本地 :5174，若在线则标记联机就绪并支持一键切换联机，离线亦零报错零重试）。
   useEffect(() => {
     let cancelled = false;
     (async () => {
       const detected = await fetchLanServerInfo();
       if (cancelled) return;
-      if (detected && boot.requestedMode === 'auto') {
+      if (
+        detected &&
+        boot.requestedMode === 'auto' &&
+        (!isFileProtocol() || parseInitialViewMode() === 'single')
+      ) {
         setSyncModeState('lan');
       } else if (!detected && boot.requestedMode === 'lan') {
         setConnectionStatus('offline_fallback');
@@ -183,12 +214,17 @@ export function useDormSyncController() {
     };
   }, [boot.requestedMode, fetchLanServerInfo]);
 
-  // 同浏览器多标签页应急同步通道（即使未启动 syncServer 也可多窗口联动演示）
+  // 同浏览器多标签页应急同步通道（即使未启动 syncServer 也可多窗口联动演示；兼容 file:// 沙箱限制）
   useEffect(() => {
     if (typeof window === 'undefined' || typeof BroadcastChannel === 'undefined') {
       return;
     }
-    const channel = new BroadcastChannel('dorm-404-sync-v1');
+    let channel: BroadcastChannel;
+    try {
+      channel = new BroadcastChannel('dorm-404-sync-v1');
+    } catch {
+      return;
+    }
     broadcastChannelRef.current = channel;
 
     channel.onmessage = (ev) => {
@@ -203,7 +239,11 @@ export function useDormSyncController() {
     };
 
     return () => {
-      channel.close();
+      try {
+        channel.close();
+      } catch {
+        // ignore
+      }
       broadcastChannelRef.current = null;
     };
   }, [syncMode]);
@@ -227,7 +267,7 @@ export function useDormSyncController() {
     const connectWs = () => {
       if (disposed) return;
       setConnectionStatus('connecting');
-      const host = window.location.hostname || 'localhost';
+      const host = window.location.hostname || '127.0.0.1';
       const wsUrl = `ws://${host}:${boot.wsPort}`;
 
       let ws: WebSocket;

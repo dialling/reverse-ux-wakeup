@@ -1,13 +1,17 @@
 import React from 'react';
 import { BatteryCharging, Signal, Wifi } from 'lucide-react';
 
+export type PhoneFrameVariant = 'default' | 'quad' | 'fullscreen';
+
 interface PhoneFrameProps {
   clock: string;
   bedLabel: string;
   roommateName: string;
   accentHex: string;
   isAlarmActive: boolean;
-  isMobileFullscreen: boolean;
+  isMobileFullscreen?: boolean;
+  variant?: PhoneFrameVariant;
+  wsBadgeText?: string;
   children: React.ReactNode;
 }
 
@@ -17,10 +21,15 @@ export function PhoneFrame({
   roommateName,
   accentHex,
   isAlarmActive,
-  isMobileFullscreen,
+  isMobileFullscreen = false,
+  variant,
+  wsBadgeText,
   children,
 }: PhoneFrameProps) {
-  if (isMobileFullscreen) {
+  const effectiveVariant: PhoneFrameVariant =
+    variant ?? (isMobileFullscreen ? 'fullscreen' : 'default');
+
+  if (effectiveVariant === 'fullscreen') {
     return (
       <div className="relative flex min-h-dvh w-full flex-col bg-[#0B1120] text-slate-100 [transform:translateZ(0)]">
         <div className="sticky top-0 z-30 flex items-center justify-between border-b border-slate-800/90 bg-[#090E1A]/95 px-4 py-2 backdrop-blur">
@@ -36,12 +45,72 @@ export function PhoneFrame({
             </span>
           </div>
           <div className="flex items-center gap-1.5 text-slate-400">
+            {wsBadgeText && (
+              <span className="rounded bg-emerald-500/20 px-1.5 py-0.5 text-[10px] font-bold text-emerald-300">
+                {wsBadgeText}
+              </span>
+            )}
             <Signal className="h-3.5 w-3.5" />
             <Wifi className="h-3.5 w-3.5" />
             <BatteryCharging className="h-4 w-4 text-[#FACC15]" />
           </div>
         </div>
         <div className="flex-1 overflow-y-auto">{children}</div>
+      </div>
+    );
+  }
+
+  if (effectiveVariant === 'quad') {
+    return (
+      <div className="relative mx-auto flex w-full max-w-[360px] flex-col items-center select-none">
+        <div
+          className={`relative flex h-[calc(100dvh-76px)] max-h-[824px] min-h-[680px] w-full flex-col overflow-hidden rounded-[36px] border-[6px] bg-[#0B1120] shadow-[0_18px_50px_-15px_rgba(0,0,0,0.85)] transition-colors duration-300 ${
+            isAlarmActive
+              ? 'alarm-glow border-red-500/90'
+              : 'border-slate-800 ring-1 ring-slate-700/80'
+          }`}
+        >
+          <div className="relative flex h-full w-full flex-col overflow-hidden bg-[#0B1120] [transform:translateZ(0)]">
+            {/* Compact Dynamic Island Status Bar */}
+            <div className="relative z-30 flex shrink-0 items-center justify-between border-b border-slate-800/80 bg-[#070B14] px-3.5 pt-2 pb-1.5">
+              <span className="font-mono text-[11px] font-extrabold tracking-wider text-slate-100">
+                {clock}
+              </span>
+
+              <div className="flex h-5 items-center gap-1 rounded-full border border-slate-800 bg-black px-2.5 shadow-inner">
+                <span
+                  className={`h-1.5 w-1.5 rounded-full ${
+                    isAlarmActive ? 'animate-ping bg-red-500' : 'bg-emerald-400'
+                  }`}
+                />
+                <span className="text-[10px] font-bold tracking-tight text-slate-200">
+                  {bedLabel} · {roommateName}
+                </span>
+              </div>
+
+              <div className="flex items-center gap-1 text-slate-300">
+                {wsBadgeText ? (
+                  <span className="rounded bg-emerald-500/20 px-1 py-0.5 font-mono text-[9px] font-bold text-emerald-300">
+                    {wsBadgeText}
+                  </span>
+                ) : (
+                  <Wifi className="h-2.5 w-2.5" />
+                )}
+                <BatteryCharging className="h-3 w-3 text-[#FACC15]" />
+              </div>
+            </div>
+
+            {/* Independent Scrollable Phone Content */}
+            <div className="flex-1 overflow-x-hidden overflow-y-auto select-text">
+              {children}
+            </div>
+
+            {/* Compact Home Bar */}
+            <div className="flex shrink-0 justify-center bg-[#070B14]/95 py-1.5">
+              <div className="h-1 w-24 rounded-full bg-slate-600/80" />
+            </div>
+          </div>
+        </div>
       </div>
     );
   }
@@ -56,13 +125,12 @@ export function PhoneFrame({
 
       {/* Outer Titanium Bezel */}
       <div
-        className={`relative flex h-[836px] w-[412px] flex-col overflow-hidden rounded-[50px] border-[9px] bg-[#0B1120] shadow-[0_25px_70px_-15px_rgba(0,0,0,0.85)] transition-colors duration-300 ${
+        className={`relative flex h-[828px] w-[408px] flex-col overflow-hidden rounded-[50px] border-[9px] bg-[#0B1120] shadow-[0_25px_70px_-15px_rgba(0,0,0,0.85)] transition-colors duration-300 ${
           isAlarmActive
             ? 'alarm-glow border-red-500/90'
             : 'border-slate-800 ring-1 ring-slate-700/80'
         }`}
       >
-        {/* Inner Viewport with transform:translateZ(0) so fixed modals stay inside phone screen */}
         <div className="relative flex h-full w-full flex-col overflow-hidden bg-[#0B1120] [transform:translateZ(0)]">
           {/* iOS Dynamic Island & Status Bar */}
           <div className="relative z-30 flex shrink-0 items-center justify-between border-b border-slate-800/80 bg-[#070B14] px-6 pt-3 pb-2.5">
@@ -70,7 +138,6 @@ export function PhoneFrame({
               {clock}
             </span>
 
-            {/* Dynamic Island */}
             <div className="flex h-6 items-center gap-1.5 rounded-full border border-slate-800 bg-black px-3.5 shadow-inner">
               <span
                 className={`h-2 w-2 rounded-full ${

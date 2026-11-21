@@ -582,7 +582,13 @@ export function DirectorConsole({
                     {copiedRole === id ? '已复制' : '复制'}
                   </button>
                   <a
-                    href={roleMobileLinks[id]}
+                    href={
+                      typeof window !== 'undefined' &&
+                      window.location.protocol === 'file:' &&
+                      !serverOnline
+                        ? `${window.location.href.split('?')[0].split('#')[0]}?role=${id}&mobile=1`
+                        : roleMobileLinks[id]
+                    }
                     target="_blank"
                     rel="noreferrer"
                     className="flex flex-1 items-center justify-center gap-1 rounded-md bg-slate-800 py-1 text-[10px] font-semibold text-[#FACC15] hover:bg-slate-700"
