@@ -194,6 +194,29 @@ describe('LAN Dual-Mode Sync Server (HTTP + WebSocket)', () => {
     expect(finalSynced.state.roommates.qiang.balanceCents).toBe(4900);
     assertMoneyConservation(finalSynced.state);
 
+    // 3. 阿强在手机端修改全寝起床闹钟时间为 08:15 -> 老张实时同步收到 targetWakeTime = '08:15' 且资金守恒
+    const setWakeAction = {
+      type: 'SET_WAKE_TIME' as const,
+      targetWakeTime: '08:15',
+    };
+    const nextWakeState = dormReducer(finalSynced.state, setWakeAction);
+    const wakeSyncOnZhangPromise = nextMessageMatching(
+      wsZhang,
+      (m) => m.type === 'STATE_SYNC' && m.state.targetWakeTime === '08:15'
+    );
+    wsQiang.send(
+      JSON.stringify({
+        type: 'COMMIT_ACTION',
+        action: setWakeAction,
+        nextState: nextWakeState,
+        baseRevision: finalSynced.state.revision,
+        forceReplace: false,
+      })
+    );
+    const syncedWakeMsg = await wakeSyncOnZhangPromise;
+    expect(syncedWakeMsg.state.targetWakeTime).toBe('08:15');
+    assertMoneyConservation(syncedWakeMsg.state);
+
     wsZhang.close();
     wsQiang.close();
   });

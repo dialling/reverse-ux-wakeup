@@ -19,7 +19,9 @@ import {
   Volume2,
 } from 'lucide-react';
 import {
+  addMinutesToHHMM,
   canBeRaided,
+  DEFAULT_WAKE_TIME,
   formatSignedYuan,
   formatYuan,
   getStatusLabel,
@@ -31,6 +33,7 @@ import {
   RaidShakingKeypadSlot,
   ShameTyperModalSlot,
 } from './MechanismSlot';
+import { WakeTimePicker } from './WakeTimePicker';
 import { DormAction, DormState, ROOMMATE_IDS, RoommateId } from '../types/dorm';
 
 interface RoommatePhoneScreenProps {
@@ -53,23 +56,37 @@ export function RoommatePhoneScreen({
   onOpenSettlement,
 }: RoommatePhoneScreenProps) {
   const me = dormState.roommates[role];
+  const wakeTime = dormState.targetWakeTime || DEFAULT_WAKE_TIME;
   const myNetCents = me.balanceCents - me.initialDepositCents;
   const incomingRaid = dormState.activeRaids[role];
   const otherRoommateIds = ROOMMATE_IDS.filter((id) => id !== role);
 
+  const isNightStandbyClock =
+    dormState.currentClock === '23:30' || dormState.currentClock === '23:31';
+
+  const handleChangeWakeTime = (nextWakeTime: string) => {
+    onDispatch({
+      type: 'SET_WAKE_TIME',
+      targetWakeTime: nextWakeTime,
+    });
+  };
+
   const handleOpenSnoozeFromAnywhere = () => {
     if (me.status === 'being_raided' || me.status === 'snooze_typing') return;
+    const snoozeClock = isNightStandbyClock
+      ? addMinutesToHHMM(wakeTime, 2)
+      : dormState.currentClock;
     if (me.status === 'awake') {
       onDispatch({
         type: 'ENTER_RELAPSE_SLEEP',
         roommateId: role,
-        clock: dormState.currentClock,
+        clock: snoozeClock,
       });
     }
     onDispatch({
       type: 'OPEN_SNOOZE_TYPER',
       roommateId: role,
-      clock: dormState.currentClock === '23:30' ? '07:02' : dormState.currentClock,
+      clock: snoozeClock,
     });
   };
 
@@ -79,12 +96,14 @@ export function RoommatePhoneScreen({
       type: 'COMPLETE_STAGE1_SLIDER',
       roommateId: role,
       preferredGame: game,
-      clock: dormState.currentClock === '23:30' ? '07:04' : dormState.currentClock,
+      clock: isNightStandbyClock
+        ? addMinutesToHHMM(wakeTime, 4)
+        : dormState.currentClock,
     });
   };
 
   const handleTriggerMyAlarm = () => {
-    const targetClock = dormState.currentClock === '23:30' ? '07:00' : dormState.currentClock;
+    const targetClock = isNightStandbyClock ? wakeTime : dormState.currentClock;
     if (me.status === 'awake') {
       onDispatch({
         type: 'ENTER_RELAPSE_SLEEP',
@@ -213,6 +232,16 @@ export function RoommatePhoneScreen({
                 );
               })}
             </div>
+
+            {/* Top Status Area Custom Wake-Up Alarm Time Control */}
+            {!(dormState.currentActId === 1 && me.status === 'sleeping') && (
+              <WakeTimePicker
+                value={wakeTime}
+                onChange={handleChangeWakeTime}
+                variant="phone-strip"
+                showPresets={!compact}
+              />
+            )}
 
             {dormState.publicPoolCents > 0 && (
               <div className="mt-2 flex items-center justify-between rounded-xl border border-[#FACC15]/40 bg-[#FACC15]/10 px-2.5 py-1 text-[10px]">
@@ -602,7 +631,7 @@ export function RoommatePhoneScreen({
               className="flex w-full items-center justify-center gap-1.5 rounded-xl border border-slate-700 bg-slate-900 py-1.5 text-[11px] font-semibold text-slate-400 hover:text-amber-300"
             >
               <EyeOff className="h-3.5 w-3.5" />
-              偷偷眯眼躺回被窝（模拟回笼觉，可被室友突袭）
+              偷偷眯眼躺回被窝（进入回笼觉状态）
             </button>
           </div>
         )}
@@ -618,15 +647,23 @@ export function RoommatePhoneScreen({
                 <div className="flex items-center justify-between">
                   <span className="flex items-center gap-1.5 text-xs font-black text-[#FACC15]">
                     <Sparkles className="h-4 w-4" />
-                    404 寝室 07:00 早起对赌契约书
+                    404 寝室 {wakeTime} 早起对赌契约书
                   </span>
                   <span className="font-mono text-[11px] font-bold text-emerald-400">
                     总池 ¥200.00
                   </span>
                 </div>
-                <ul className="mt-2 space-y-1 text-[11px] leading-relaxed text-slate-300">
+
+                {/* Custom Wake-Up Alarm Time Control inside Contract Card */}
+                <WakeTimePicker
+                  value={wakeTime}
+                  onChange={handleChangeWakeTime}
+                  variant="contract"
+                />
+
+                <ul className="mt-2.5 space-y-1 text-[11px] leading-relaxed text-slate-300">
                   <li>1. 四人各交 ¥50.00 契约押金，账本分毫不差实时守恒；</li>
-                  <li>2. 07:00 闯过「逃跑滑块 + 清醒小游戏」才算真起床；</li>
+                  <li>2. {wakeTime} 闯过「逃跑滑块 + 清醒小游戏」才算真起床；</li>
                   <li>3. 贪睡须禁粘贴手打社死认怂长文，犹豫每 10s 滴血扣 ¥1；</li>
                   <li>4. 清醒室友可随时发起「晃动乱序算术突袭」，抓包立分 ¥10！</li>
                 </ul>
@@ -655,7 +692,7 @@ export function RoommatePhoneScreen({
                     className="flex w-full items-center justify-center gap-1.5 rounded-xl bg-[#FACC15] py-2.5 text-xs font-black text-slate-950 shadow hover:bg-yellow-300"
                   >
                     <AlarmClock className="h-4 w-4" />
-                    ⏰ 模拟 07:00 闹钟响起（进入逃跑滑块）
+                    ⏰ 立即拉响 {wakeTime} 契约闹钟
                   </button>
 
                   <button
@@ -663,12 +700,12 @@ export function RoommatePhoneScreen({
                     onClick={() =>
                       onDispatch({
                         type: 'SIGN_ALL_AND_START_ALARM',
-                        clock: '07:00',
+                        clock: wakeTime,
                       })
                     }
                     className="flex w-full items-center justify-center gap-1.5 rounded-xl border border-amber-500/40 bg-amber-500/10 py-2 text-[11px] font-bold text-amber-300 hover:bg-amber-500/20"
                   >
-                    全寝 4 人同时拉响 07:00 夺命闹钟
+                    全寝 4 人同时拉响 {wakeTime} 夺命闹钟
                   </button>
                 </div>
               </div>
@@ -679,7 +716,7 @@ export function RoommatePhoneScreen({
                   {me.status === 'settled_slacker'
                     ? '今日赖床违约已结算，感谢赞助全寝鸡腿！'
                     : me.status === 'sleeping'
-                      ? '沉睡未起 · 07:00 夺命闹钟随时炸响！'
+                      ? `沉睡未起 · ${wakeTime} 夺命闹钟随时炸响！`
                       : '高危赖床/回笼觉 · 随时可能被室友突袭查岗！'}
                 </div>
                 <p className="mt-1 text-[11px] text-slate-300">{me.lastActionNote}</p>
@@ -692,7 +729,7 @@ export function RoommatePhoneScreen({
                     {me.status === 'sleeping' ? (
                       <>
                         <AlarmClock className="h-4 w-4" />
-                        ⏰ 模拟 07:00 闹钟响起
+                        ⏰ 立即拉响 {wakeTime} 契约闹钟
                       </>
                     ) : (
                       <>
@@ -710,11 +747,10 @@ export function RoommatePhoneScreen({
 
       {/* Bottom In-Phone Closed-Loop Toolbar + Live Ledger Stream */}
       <div className="mt-2.5 space-y-2">
-        {/* Self-Contained In-Phone Quick Experience Bar */}
         <div className="rounded-2xl border border-slate-800/95 bg-slate-900/90 p-2">
           <div className="mb-1.5 flex items-center justify-between px-0.5">
             <span className="text-[10px] font-bold text-slate-400">
-              App 内快捷体验与日终结算
+              清晨核验快捷入口与日终清算
             </span>
             <button
               type="button"

@@ -1,14 +1,17 @@
 import React, { useMemo, useState } from 'react';
 import {
-  Radio,
   ReceiptText,
   RotateCcw,
   ShieldCheck,
   Sparkles,
   Wifi,
 } from 'lucide-react';
-import { assertMoneyConservation, formatYuan } from '../core/dormEngine';
-import { STORY_ACTS } from '../core/storyActs';
+import {
+  assertMoneyConservation,
+  DEFAULT_WAKE_TIME,
+  formatYuan,
+} from '../core/dormEngine';
+import { getStoryActsForWakeTime } from '../core/storyActs';
 import { ViewMode } from '../core/syncClient';
 import { useQuadDormSync } from '../core/useQuadDormSync';
 import { ROOMMATE_IDS } from '../types/dorm';
@@ -16,6 +19,7 @@ import { PhoneFrame } from './PhoneFrame';
 import { RoommatePhoneScreen } from './RoommatePhoneScreen';
 import { SettlementModal } from './SettlementModal';
 import { ViewModeBar } from './ViewModeBar';
+import { WakeTimePicker } from './WakeTimePicker';
 
 interface QuadPhoneWallProps {
   currentView: ViewMode;
@@ -37,6 +41,7 @@ export function QuadPhoneWall({
     dispatchFromPhone,
     jumpAllPhonesToAct,
     resetAllPhonesDay,
+    setAllPhonesWakeTime,
   } = useQuadDormSync();
 
   const [showSettlement, setShowSettlement] = useState<boolean>(false);
@@ -46,6 +51,9 @@ export function QuadPhoneWall({
     [primaryState]
   );
 
+  const wakeTime = primaryState.targetWakeTime || DEFAULT_WAKE_TIME;
+  const dynamicActs = useMemo(() => getStoryActsForWakeTime(wakeTime), [wakeTime]);
+
   const totalConnectedPeers = lanInfo?.connectedClients ?? wsOnlineCount;
 
   return (
@@ -53,26 +61,29 @@ export function QuadPhoneWall({
       {/* Slim Top Status & Control Strip */}
       <header className="mx-auto mb-2 flex w-full max-w-[1480px] flex-wrap items-center justify-between gap-2 rounded-2xl border border-slate-800/95 bg-[#0F172A]/95 px-3.5 py-2 shadow-lg backdrop-blur">
         {/* Brand + 3-View Switcher */}
-        <div className="flex flex-wrap items-center gap-2.5">
+        <div className="flex flex-wrap items-center gap-2">
           <div className="flex items-center gap-2">
             <span className="flex h-7 w-7 items-center justify-center rounded-lg bg-[#FACC15] text-xs font-black text-slate-950">
               404
             </span>
-            <div>
-              <div className="flex items-center gap-1.5">
-                <h1 className="text-sm font-black tracking-tight text-white">
-                  《醒醒！分钱了》4机联机同屏墙
-                </h1>
-              </div>
-            </div>
+            <h1 className="text-sm font-black tracking-tight text-white">
+              《醒醒！分钱了》Rise &amp; Fine · 4机同屏
+            </h1>
           </div>
 
           <ViewModeBar currentView={currentView} onChangeView={onChangeView} compact />
         </div>
 
-        {/* Center Conservation + Live 4-Phone WS Sync Badge */}
-        <div className="flex flex-wrap items-center gap-2">
-          <span className="inline-flex items-center gap-1.5 rounded-xl border border-[#FACC15]/40 bg-[#FACC15]/10 px-2.5 py-1 font-mono text-[11px] font-bold text-[#FACC15]">
+        {/* Center Conservation + Wake Time Picker + Live 4-Phone WS Sync Badge */}
+        <div className="flex flex-wrap items-center gap-1.5">
+          <WakeTimePicker
+            value={wakeTime}
+            onChange={setAllPhonesWakeTime}
+            variant="inline"
+            showPresets
+          />
+
+          <span className="inline-flex items-center gap-1 rounded-xl border border-[#FACC15]/40 bg-[#FACC15]/10 px-2 py-1 font-mono text-[11px] font-bold text-[#FACC15]">
             <ShieldCheck className="h-3.5 w-3.5" />
             资金守恒 {formatYuan(conservation.actualTotalCents)}
             {conservation.publicPoolCents > 0 &&
@@ -83,7 +94,7 @@ export function QuadPhoneWall({
             type="button"
             onClick={() => setBusMode(busMode === 'lan' ? 'local' : 'lan')}
             title="点击切换局域网 WebSocket / 纯本地共享总线"
-            className={`inline-flex items-center gap-1.5 rounded-xl border px-2.5 py-1 text-[11px] font-extrabold transition ${
+            className={`inline-flex items-center gap-1 rounded-xl border px-2 py-1 text-[11px] font-extrabold transition ${
               busMode === 'lan' && wsOnlineCount === 4
                 ? 'border-emerald-500/45 bg-emerald-500/15 text-emerald-300'
                 : busMode === 'lan' && wsOnlineCount > 0
@@ -103,29 +114,29 @@ export function QuadPhoneWall({
             ) : (
               <>
                 <Sparkles className="h-3.5 w-3.5 text-[#FACC15]" />
-                本地4机实时联动总线（零后端免配同步）
+                本地4机实时联动总线
               </>
             )}
           </button>
         </div>
 
-        {/* Right: Quick 5-Act Switcher + Settlement + Reset */}
+        {/* Right: Quick Dynamic Time Moments Switcher + Settlement + Reset */}
         <div className="flex flex-wrap items-center gap-1">
-          {STORY_ACTS.map((act) => {
+          {dynamicActs.map((act) => {
             const active = primaryState.currentActId === act.actId;
             return (
               <button
                 key={act.actId}
                 type="button"
                 onClick={() => jumpAllPhonesToAct(act.actId)}
-                title={`${act.title} (${act.clock})`}
-                className={`rounded-lg px-2 py-1 text-[11px] font-extrabold transition ${
+                title={act.title}
+                className={`rounded-lg px-2 py-1 font-mono text-[11px] font-extrabold transition ${
                   active
                     ? 'bg-[#FACC15] text-slate-950 shadow'
                     : 'border border-slate-800 bg-slate-900 text-slate-300 hover:border-slate-600 hover:text-white'
                 }`}
               >
-                幕{act.actId}
+                {act.clock}
               </button>
             );
           })}

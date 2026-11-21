@@ -1,4 +1,4 @@
-# 《醒醒！分钱了》(Snooze & Lose) 全链路自动化与真实浏览器端到端通关验证报告
+# 《醒醒！分钱了》(Rise & Fine) 全链路自动化与真实浏览器端到端通关验证报告
 
 - **验证时间**：2026-11-21
 - **工程路径**：`reverse-ux-wakeup`
@@ -71,3 +71,44 @@
 5. `ledger/evidence/screen-parking-and-raid.png` —— 老张突袭回笼觉小李：持续倾斜摇摆的乱序数字键盘算术核验
 6. `ledger/evidence/screen-settlement-bill.png` —— 404 寝室今日鸡腿分红结算单与 `¥200.00` 资金守恒审计印章
 7. `ledger/evidence/screen-mobile-fullscreen.png` —— `?role=li&mobile=1` 移动端真机全屏自适应视图
+8. `ledger/evidence/screen-quad-phones-lan.png` —— `醒醒分钱了-4部联机手机同屏版.html`（1440×900 4 机并排同屏墙 + 4 路独立 WebSocket 联机突袭同步实测）
+9. `ledger/evidence/screen-single-phone-demo.png` —— `醒醒分钱了-单部手机版.html`（单部手机居中沉浸个人端闭环视图）
+
+---
+
+## 四、`file://` 双击零白屏独立单文件版、三视图与纯净产品界面专项复核
+
+为支持脱离终端与开发服务器直接双击打开展示，工程新增 `scripts/build-standalone.mjs`（集成至 `npm run build`），将 React 19 + Tailwind + 5 重防赖床核验机制 + 离线二维码生成器内联编译为标准非模块 IIFE `<script>` 单文件 HTML（每个约 `460 KB`，彻底消除 `file://` 下 `<script type="module">` 与 `/assets/` 的浏览器 CORS 拦截白屏问题），并在源码与构建版 `index.html` 中内置同步跳转守卫：
+
+1. **三款纯净产品命名单文件入口与 `file://` 实测（含空格与中文路径 `/Users/a27/Projects/x 黑客松/最终交付内容/`）**：
+   - `醒醒分钱了-4部联机手机同屏版.html`（`?view=quad`）：移除右侧总控台，在 `1440×900` 视口横向无溢出并排渲染 4 位室友手机（每台 `348×824 px`）。当后台 `:5174` 运行时自动建立 **4 路独立 WebSocket 客户端连接**（`WS 联机状态 · 4部同屏手机实时在线`），1 号床老张点击「突袭查岗TA」后 3 号床小李手机实时同步弹出乱序算术核验；未启动服务时无缝回退至内存共享总线联机。
+   - `醒醒分钱了-单部手机版.html`（`?view=single`）：单部手机居中沉浸呈现（移动端自动铺满全屏），手机屏幕内部完整闭环集成 `立即拉响 07:00 早八闹钟`、清醒室友监督列表（一键 `突袭查岗TA`）及底部清晨核验快捷入口（`连线关` / `挪车关` / `认怂书` / `结算单` / `重置新一天`）。
+   - `醒醒分钱了-寝室总控台版.html`（`?view=director`）：左侧手机终端 + 右侧 `404 寝室契约总控台`（`DORM-404 CENTER`），支持 `23:30 · 深夜签约`、`07:00 · 闹钟响起`、`07:02 · 申请贪睡`、`07:04 · 清醒核验`、`07:08 · 查岗结算` 关键时刻切换与局域网真机扫码上号。
+   - 双击 `项目完整源码/reverse-ux-wakeup/index.html` 或 `dist/index.html` 时，`file://` 守卫在毫秒级内自动重定向至同级交付目录的 `醒醒分钱了-寝室总控台版.html`，`agent-browser errors` 全程 **0 报错**。
+2. **UI 第四面墙元词汇清零核验**：
+   - 对全部 `src/`、`index.html`、`scripts/build-standalone.mjs` 及编译后的单文件 HTML 执行正则扫描与浏览器运行态 `document.body.innerText` 断言，`答辩 / 路演 / 剧本 / 快进器 / 切幕 / 第1..5幕 / ACT / 上帝 / 导播 / DIRECTOR CONSOLE / Demo / 机制槽位 / 逆向 UX` 全部为 **0 匹配**（`null`）。
+3. **最终交付目录（`/Users/a27/Projects/x 黑客松/最终交付内容`）自包含完整性核验**：
+   - 包含 `README.md`、3 个独立单文件 HTML、`一键启动局域网联机服务.command`、`一键启动局域网联机服务-Windows.bat`、`Devpost画廊配图（3比2最佳比例·直接拖入）/`、`宣传海报与Dify工作流/` 与干净的 `项目完整源码/reverse-ux-wakeup/`（含预编译 `dist/` 与零依赖 `server/lan-standalone-server.cjs`，零 `node_modules` / `.git` / `.DS_Store`）。
+
+---
+
+## 五、三大体验与跨机可移植性升级专项验证（闹钟时间自选 · Rise & Fine 品牌统一 · 零依赖一键联机）
+
+### 1. 全寝起床闹钟时间自选（`targetWakeTime` 全链路联动）
+- **核心引擎与数学单测 (`14/14` Vitest 通过)**：
+  - `DormState` 新增 `targetWakeTime`（默认 `'07:00'`，`HH:MM` 严格校验）与 `{ type: 'SET_WAKE_TIME', targetWakeTime }` 动作；`addMinutesToHHMM` 支持跨小时（`'07:55' + 8 -> '08:03'`）、跨午夜（`'23:55' + 8 -> '00:03'`）与负偏移计算。
+  - 深夜待命态（`23:30`）调整闹钟时间时保持当前时钟 `23:30` 并更新全寝契约与流水；清晨响铃后调整闹钟时间时按偏移量同步平移当前寝室时钟与已醒打卡时刻，且 `RESET_DAY` 自动保留用户设定的闹钟时间，全程严守 `¥200.00` 资金守恒不变量。
+- **四端 UI 与 WebSocket 实时同步实测**：
+  - 手机端（签约卡 + 顶部状态卡）、404 寝室契约总控台、4 机同屏顶栏、单部手机个人端胶囊栏均集成 `<input type="time">` 任意分钟选择器与 `06:30 / 07:00 / 07:30 / 08:00 / 08:30` 快捷胶囊。
+  - 无头浏览器实测将闹钟改为 `08:15` 后，手机签约卡（`404 寝室 08:15 早起对赌契约书`）、拉响按钮（`立即拉响 08:15 契约闹钟`）、总控台 5 大关键时段（`23:30 · 深夜签约`、`08:15 · 闹钟响起`、`08:17 · 申请贪睡`、`08:19 · 清醒核验`、`08:23 · 查岗结算`）及 `:15274/api/state`（`"targetWakeTime":"08:15"`）毫秒级同步生效。
+
+### 2. 官方英文品牌名全局统一为 `Rise & Fine`
+- 全局扫描并更新应用顶栏、浏览器标题、`package.json`、服务端接口与启动横幅、编译脚本、工作流配置与全部说明文档为 **`Rise & Fine` / `RISE & FINE`**。
+- 全仓源码及无头浏览器运行态对旧名 `Snooze & Lose` 正则断言匹配数为 **`0`**。
+
+### 3. 跨电脑免 `npm install` / 免 `node_modules` 一键启动局域网联机服务
+- **预编译零依赖单文件服务端 (`server/lan-standalone-server.cjs`, `146.0 KB`)**：将 WebSocket 实时状态同步服务、局域网 IPv4 探测 `/api/lan-info` 与 `dist/` 静态 Web 服务内联打包为纯 Node 内置模块可执行包（内置 `WS_NO_BUFFER_UTIL=1` 纯 JS 模式，彻底免除原生编译与 `node_modules`）。
+- **双端启动器与端口避让 / 无 Node 兜底实测**：
+  - 提供 macOS `一键启动局域网联机服务.command`（自动清除 `com.apple.quarantine` 隔离属性，自动扫描系统 PATH / Homebrew / nvm / fnm / volta / asdf / mise 等全路径 Node，引号安全兼容含空格与中文目录）与 Windows `一键启动局域网联机服务-Windows.bat`。
+  - **零 `node_modules` 实测**：在确认 `最终交付内容/项目完整源码/reverse-ux-wakeup/node_modules` 不存在的前提下直接运行 `lan-standalone-server.cjs`，当默认 `:5173/:5174` 被占用时自动避让至空闲端口并向页面注入 `window.__WAKEUP_RUNTIME__`，浏览器端零配置自动连上新 WebSocket 端口。
+  - **无 Node 环境模拟实测**：在剥离 Node 的纯净 `PATH` 沙箱中执行 `.command`，脚本零报错打印中文提示并自动调用 `open` 打开免安装 `醒醒分钱了-4部联机手机同屏版.html`。

@@ -1,0 +1,995 @@
+<!DOCTYPE html>
+<!--
+  ==========================================================================
+  《醒醒！分钱了》(Rise & Fine) —— 逆向 UX 挑战赛参赛宣传海报（可自由二次编辑版）
+  画布规格：1200 × 1800 px（2:3 标准赛事竖版展架/投屏比例，零外部图片与字体依赖）
+  生成链路：基于 Dify 工作流（deepseek-v4-pro）原始输出结构与文案亮点进行二次视觉精修
+  快速编辑指南：
+    1. 修改配色：直接调整下方 :root 中的 --yellow / --red / --slate / --paper 变量；
+    2. 修改文案：在对应中文注释区块（顶部标识 / 主标题 / 404流转图 / 五大关卡 / 底部背书）改字保存即可；
+    3. 导出成品：浏览器打开后打印（目标选“另存为 PDF”，边距“无”，勾选“背景图形”）即可无损导出。
+  ==========================================================================
+-->
+<html lang="zh-CN">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=1200, initial-scale=1.0" />
+  <title>《醒醒！分钱了》Rise &amp; Fine —— 逆向 UX 挑战赛宣传海报</title>
+  <style>
+    :root {
+      --yellow: #FACC15;
+      --yellow-soft: #FEF9C3;
+      --red: #EF4444;
+      --red-dark: #B91C1C;
+      --slate: #0F172A;
+      --ink: #090D16;
+      --paper: #FAF8F2;
+      --card-bg: #FFFFFF;
+      --green: #16A34A;
+      --green-soft: #DCFCE7;
+      --blue: #2563EB;
+      --sans: 'PingFang SC', 'Hiragino Sans GB', 'Noto Sans CJK SC', 'Microsoft YaHei', system-ui, -apple-system, sans-serif;
+      --mono: 'JetBrains Mono', 'SFMono-Regular', 'Menlo', 'Monaco', 'Consolas', monospace;
+    }
+
+    @page {
+      size: 1200px 1800px;
+      margin: 0;
+    }
+
+    * {
+      margin: 0;
+      padding: 0;
+      box-sizing: border-box;
+      -webkit-print-color-adjust: exact !important;
+      print-color-adjust: exact !important;
+    }
+
+    html, body {
+      width: 1200px;
+      height: 1800px;
+      margin: 0;
+      padding: 0;
+      background: var(--paper);
+      font-family: var(--sans);
+      color: var(--slate);
+      overflow: hidden;
+      -webkit-font-smoothing: antialiased;
+    }
+
+    /* 主海报容器：严格锁定 1200×1800，零溢出 */
+    .poster {
+      width: 1200px;
+      height: 1800px;
+      position: relative;
+      display: flex;
+      flex-direction: column;
+      justify-content: space-between;
+      background-color: var(--paper);
+      background-image:
+        linear-gradient(to right, rgba(15, 23, 42, 0.055) 1px, transparent 1px),
+        linear-gradient(to bottom, rgba(15, 23, 42, 0.055) 1px, transparent 1px);
+      background-size: 30px 30px;
+      border-left: 8px solid var(--ink);
+      border-right: 8px solid var(--ink);
+      overflow: hidden;
+    }
+
+    /* 上下防爆警戒斜纹条 */
+    .hazard-bar {
+      width: 100%;
+      height: 20px;
+      flex-shrink: 0;
+      background: repeating-linear-gradient(
+        -45deg,
+        var(--yellow) 0px,
+        var(--yellow) 22px,
+        var(--ink) 22px,
+        var(--ink) 44px
+      );
+      border-bottom: 4px solid var(--ink);
+    }
+    .hazard-bar.bottom {
+      border-bottom: none;
+      border-top: 4px solid var(--ink);
+    }
+
+    /* 核心内容画布 */
+    .canvas-body {
+      flex: 1;
+      padding: 22px 34px;
+      display: flex;
+      flex-direction: column;
+      justify-content: space-between;
+      gap: 14px;
+      position: relative;
+      z-index: 2;
+    }
+
+    /* ==================== 1. 顶部赛事标识栏 ==================== */
+    .top-bar {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      background: var(--slate);
+      color: #FFFFFF;
+      border: 4px solid var(--ink);
+      box-shadow: 6px 6px 0 var(--red);
+      padding: 10px 18px;
+      height: 54px;
+    }
+    .top-bar-left {
+      display: flex;
+      align-items: center;
+      gap: 12px;
+      font-size: 18px;
+      font-weight: 900;
+      letter-spacing: 1px;
+    }
+    .track-pill {
+      background: var(--yellow);
+      color: var(--ink);
+      padding: 3px 10px;
+      border: 2px solid var(--ink);
+      font-family: var(--mono);
+      font-size: 14px;
+      font-weight: 900;
+    }
+    .top-bar-right {
+      font-family: var(--mono);
+      font-size: 14px;
+      font-weight: 800;
+      color: var(--yellow);
+      background: rgba(250, 204, 21, 0.12);
+      border: 1.5px solid var(--yellow);
+      padding: 4px 12px;
+      letter-spacing: 1px;
+    }
+
+    /* ==================== 2. 主视觉标题区 + 闹钟手机模型 ==================== */
+    .hero-section {
+      display: grid;
+      grid-template-columns: 1fr 296px;
+      gap: 22px;
+      align-items: stretch;
+    }
+    .hero-left {
+      display: flex;
+      flex-direction: column;
+      justify-content: space-between;
+    }
+    .kicker-row {
+      display: flex;
+      gap: 10px;
+      align-items: center;
+      margin-bottom: 4px;
+    }
+    .kicker-tag {
+      background: var(--yellow);
+      color: var(--ink);
+      border: 3px solid var(--ink);
+      box-shadow: 3px 3px 0 var(--ink);
+      padding: 4px 12px;
+      font-size: 14px;
+      font-weight: 900;
+    }
+    .kicker-tag.red {
+      background: var(--red);
+      color: #FFFFFF;
+    }
+    .kicker-tag.dark {
+      background: var(--slate);
+      color: var(--yellow);
+    }
+
+    .title-lockup {
+      display: flex;
+      align-items: center;
+      gap: 16px;
+      margin: 4px 0 8px;
+    }
+    .main-title {
+      font-size: 86px;
+      font-weight: 900;
+      line-height: 1.02;
+      letter-spacing: -2px;
+      color: var(--ink);
+      text-shadow: 5px 5px 0 var(--yellow), 10px 10px 0 var(--red);
+    }
+    .en-stamp {
+      background: var(--ink);
+      color: var(--yellow);
+      border: 4px solid var(--ink);
+      box-shadow: 5px 5px 0 var(--red);
+      padding: 8px 14px;
+      font-family: var(--mono);
+      font-size: 23px;
+      font-weight: 900;
+      line-height: 1.12;
+      letter-spacing: 1.5px;
+      transform: rotate(-2.5deg);
+      text-align: center;
+    }
+    .en-stamp small {
+      display: block;
+      font-size: 11px;
+      color: #FFFFFF;
+      letter-spacing: 2px;
+      margin-top: 3px;
+    }
+
+    .slogan-box {
+      background: var(--red);
+      color: #FFFFFF;
+      border: 4px solid var(--ink);
+      box-shadow: 7px 7px 0 var(--ink);
+      padding: 13px 20px;
+      position: relative;
+      margin-bottom: 10px;
+    }
+    .slogan-main {
+      font-size: 31px;
+      font-weight: 900;
+      letter-spacing: 0.5px;
+      text-shadow: 3px 3px 0 var(--ink);
+      line-height: 1.2;
+    }
+    .slogan-sub {
+      margin-top: 5px;
+      font-size: 14.5px;
+      font-weight: 800;
+      color: var(--yellow-soft);
+      letter-spacing: 0.3px;
+    }
+
+    .thesis-strip {
+      background: #FFFFFF;
+      border: 3.5px solid var(--ink);
+      border-left: 12px solid var(--yellow);
+      box-shadow: 5px 5px 0 var(--ink);
+      padding: 11px 16px;
+      font-size: 15px;
+      line-height: 1.48;
+      font-weight: 700;
+      color: var(--slate);
+    }
+    .thesis-strip strong {
+      background: var(--yellow-soft);
+      padding: 0 4px;
+      color: var(--ink);
+      font-weight: 900;
+    }
+
+    .hero-phone-card {
+      background: var(--slate);
+      border: 4px solid var(--ink);
+      box-shadow: 8px 8px 0 var(--yellow);
+      border-radius: 22px;
+      padding: 10px;
+      display: flex;
+      flex-direction: column;
+      justify-content: space-between;
+    }
+
+    /* ==================== 通用分区标题条 ==================== */
+    .section-header {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      margin-bottom: 10px;
+    }
+    .section-badge {
+      background: var(--ink);
+      color: var(--yellow);
+      border: 3.5px solid var(--ink);
+      box-shadow: 5px 5px 0 var(--red);
+      padding: 6px 16px;
+      font-size: 21px;
+      font-weight: 900;
+      letter-spacing: 1px;
+      display: inline-flex;
+      align-items: center;
+      gap: 10px;
+    }
+    .section-badge .num {
+      background: var(--red);
+      color: #FFFFFF;
+      font-family: var(--mono);
+      font-size: 14px;
+      padding: 2px 7px;
+      border: 2px solid var(--yellow);
+    }
+    .section-note {
+      font-size: 14px;
+      font-weight: 900;
+      color: var(--ink);
+      background: var(--yellow);
+      border: 3px solid var(--ink);
+      box-shadow: 3px 3px 0 var(--ink);
+      padding: 5px 12px;
+    }
+
+    /* ==================== 3. 404寝室押金流转闭环区 ==================== */
+    .loop-grid {
+      display: grid;
+      grid-template-columns: 726px 1fr;
+      gap: 18px;
+      align-items: stretch;
+    }
+    .loop-diagram-card {
+      background: #FFFFFF;
+      border: 4px solid var(--ink);
+      box-shadow: 7px 7px 0 var(--ink);
+      padding: 10px 12px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+    }
+    .pillars-card {
+      background: var(--slate);
+      color: #FFFFFF;
+      border: 4px solid var(--ink);
+      box-shadow: 7px 7px 0 var(--red);
+      padding: 14px 16px;
+      display: flex;
+      flex-direction: column;
+      justify-content: space-between;
+    }
+    .pillar-item {
+      border-bottom: 1.5px dashed rgba(250, 204, 21, 0.35);
+      padding-bottom: 9px;
+    }
+    .pillar-item:last-of-type {
+      border-bottom: none;
+      padding-bottom: 0;
+    }
+    .pillar-head {
+      display: flex;
+      align-items: center;
+      gap: 8px;
+      font-size: 16.5px;
+      font-weight: 900;
+      color: var(--yellow);
+      margin-bottom: 4px;
+    }
+    .pillar-head span {
+      background: var(--red);
+      color: #FFFFFF;
+      font-family: var(--mono);
+      font-size: 12px;
+      padding: 1px 6px;
+      border: 1.5px solid #FFFFFF;
+    }
+    .pillar-desc {
+      font-size: 13px;
+      line-height: 1.42;
+      color: #E2E8F0;
+      font-weight: 600;
+    }
+    .invariant-banner {
+      background: rgba(250, 204, 21, 0.14);
+      border: 2px solid var(--yellow);
+      padding: 8px 10px;
+      text-align: center;
+      font-family: var(--mono);
+      font-size: 13px;
+      font-weight: 900;
+      color: var(--yellow);
+    }
+
+    /* ==================== 4. 五大逆向交互关卡 Bento 矩阵 ==================== */
+    .mech-top-row {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 14px;
+      margin-bottom: 14px;
+    }
+    .mech-bottom-row {
+      display: grid;
+      grid-template-columns: repeat(3, 1fr);
+      gap: 14px;
+    }
+    .mech-card {
+      background: var(--card-bg);
+      border: 4px solid var(--ink);
+      box-shadow: 6px 6px 0 var(--ink);
+      padding: 12px 14px;
+      display: flex;
+      flex-direction: column;
+      justify-content: space-between;
+      position: relative;
+    }
+    .mech-card.wide {
+      display: grid;
+      grid-template-columns: 200px 1fr;
+      gap: 14px;
+      align-items: center;
+    }
+    .mech-visual {
+      background: var(--paper);
+      border: 3px solid var(--ink);
+      height: 100%;
+      min-height: 124px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      overflow: hidden;
+    }
+    .mech-card:not(.wide) .mech-visual {
+      height: 112px;
+      margin-bottom: 8px;
+    }
+    .mech-head {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      gap: 6px;
+      margin-bottom: 6px;
+    }
+    .mech-title {
+      font-size: 17.5px;
+      font-weight: 900;
+      color: var(--ink);
+      line-height: 1.2;
+    }
+    .mech-idx {
+      background: var(--red);
+      color: #FFFFFF;
+      font-family: var(--mono);
+      font-size: 12.5px;
+      font-weight: 900;
+      padding: 2px 7px;
+      border: 2px solid var(--ink);
+      flex-shrink: 0;
+    }
+    .mech-pain {
+      font-size: 13px;
+      line-height: 1.42;
+      color: #1E293B;
+      font-weight: 600;
+      margin-bottom: 7px;
+    }
+    .mech-pass {
+      background: var(--green-soft);
+      border: 2px solid var(--ink);
+      color: #14532D;
+      font-size: 12px;
+      font-weight: 800;
+      padding: 4px 8px;
+      line-height: 1.3;
+    }
+
+    /* ==================== 5. 底部硬核工程背书与扫码联机栏 ==================== */
+    .footer-grid {
+      display: grid;
+      grid-template-columns: 1fr 376px;
+      gap: 18px;
+      align-items: stretch;
+    }
+    .eng-box {
+      background: var(--slate);
+      color: #FFFFFF;
+      border: 4px solid var(--ink);
+      box-shadow: 6px 6px 0 var(--yellow);
+      padding: 14px 18px;
+      display: flex;
+      flex-direction: column;
+      justify-content: space-between;
+    }
+    .eng-title-row {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      border-bottom: 2px solid rgba(250, 204, 21, 0.35);
+      padding-bottom: 8px;
+      margin-bottom: 8px;
+    }
+    .eng-title {
+      font-size: 18px;
+      font-weight: 900;
+      color: var(--yellow);
+      letter-spacing: 0.5px;
+    }
+    .dify-tag {
+      font-family: var(--mono);
+      font-size: 11.5px;
+      font-weight: 800;
+      background: rgba(239, 68, 68, 0.22);
+      color: #FCA5A5;
+      border: 1.5px solid var(--red);
+      padding: 2px 8px;
+    }
+    .eng-badges {
+      display: grid;
+      grid-template-columns: repeat(3, 1fr);
+      gap: 10px;
+    }
+    .eng-item {
+      background: rgba(255, 255, 255, 0.06);
+      border: 1.5px solid rgba(250, 204, 21, 0.45);
+      padding: 8px 10px;
+    }
+    .eng-item strong {
+      display: block;
+      font-size: 13.5px;
+      color: var(--yellow);
+      margin-bottom: 3px;
+      font-weight: 900;
+    }
+    .eng-item p {
+      font-size: 11.8px;
+      line-height: 1.35;
+      color: #CBD5E1;
+      font-weight: 600;
+    }
+
+    .lan-box {
+      background: var(--yellow);
+      border: 4px solid var(--ink);
+      box-shadow: 6px 6px 0 var(--red);
+      padding: 12px 14px;
+      display: flex;
+      align-items: center;
+      gap: 14px;
+    }
+    .qr-card {
+      width: 112px;
+      height: 112px;
+      background: #FFFFFF;
+      border: 3.5px solid var(--ink);
+      box-shadow: 3px 3px 0 var(--ink);
+      padding: 6px;
+      flex-shrink: 0;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+    }
+    .lan-copy h4 {
+      font-size: 17px;
+      font-weight: 900;
+      color: var(--ink);
+      line-height: 1.25;
+      margin-bottom: 5px;
+    }
+    .lan-copy p {
+      font-size: 12.5px;
+      font-weight: 700;
+      color: var(--slate);
+      line-height: 1.38;
+      margin-bottom: 6px;
+    }
+    .lan-pill {
+      display: inline-block;
+      background: var(--ink);
+      color: var(--yellow);
+      font-family: var(--mono);
+      font-size: 11.5px;
+      font-weight: 900;
+      padding: 3px 8px;
+    }
+  </style>
+</head>
+<body>
+  <div class="poster">
+    <!-- 顶部防爆警戒斜纹 -->
+    <div class="hazard-bar"></div>
+
+    <div class="canvas-body">
+      <!-- ==================== 1. 顶部赛事标识栏 ==================== -->
+      <header class="top-bar">
+        <div class="top-bar-left">
+          <span class="track-pill">REVERSE UX CHALLENGE</span>
+          <span>逆向 UX 挑战赛 ·「用户讨厌但又不得不用」赛道</span>
+        </div>
+        <div class="top-bar-right">DORM-404 CONTRACT · 07:00 AM</div>
+      </header>
+
+      <!-- ==================== 2. 主标题口号 + 手机警报界面缩略图 ==================== -->
+      <section class="hero-section">
+        <div class="hero-left">
+          <div>
+            <div class="kicker-row">
+              <span class="kicker-tag">自愿受虐早起契约</span>
+              <span class="kicker-tag red">4人寝室小圈子强绑定</span>
+              <span class="kicker-tag dark">讨厌度 ≡ 清醒度</span>
+            </div>
+
+            <div class="title-lockup">
+              <h1 class="main-title">醒醒！分钱了</h1>
+              <div class="en-stamp">
+                RISE &amp; FINE
+                <small>ANTI-UX ALARM</small>
+              </div>
+            </div>
+          </div>
+
+          <div class="slogan-box">
+            <div class="slogan-main">“你多睡的每一分钟，都在亲手给室友加鸡腿！”</div>
+            <div class="slogan-sub">每天早上 07:00 恨它恨到咬牙切齿，前一晚熄灯却抢着交 ¥50 押金锁死全寝室！</div>
+          </div>
+
+          <div class="thesis-strip">
+            传统温和闹钟的“丝滑右滑”纵容了半梦半醒的<strong>脊髓反射盲按</strong>；本品用<strong>五重反肌肉记忆关卡 + 室友零和分钱飞轮</strong>，把赖床代价变成上铺碗里的卤鸡腿——<strong>无需外部海量流量，1 间 4 人寝室即可自给自足跑通闭环！</strong>
+          </div>
+        </div>
+
+        <!-- 右侧高还原 App 警报手机壳矢量插画 -->
+        <div class="hero-phone-card">
+          <svg viewBox="0 0 268 308" width="100%" height="100%" xmlns="http://www.w3.org/2000/svg">
+            <rect x="4" y="4" width="260" height="300" rx="16" fill="#090D16" stroke="#FACC15" stroke-width="3"/>
+            <!-- 刘海状态栏 -->
+            <rect x="88" y="10" width="92" height="14" rx="7" fill="#1E293B"/>
+            <text x="18" y="21" fill="#FACC15" font-family="monospace" font-size="10" font-weight="900">404寝室·2号床</text>
+            <circle cx="206" cy="17" r="4" fill="#EF4444"/>
+            <text x="215" y="21" fill="#EF4444" font-family="monospace" font-size="10" font-weight="900">LIVE</text>
+            <!-- 刺眼早八红警报主卡 -->
+            <rect x="14" y="30" width="240" height="86" rx="8" fill="#EF4444" stroke="#090D16" stroke-width="3"/>
+            <text x="134" y="50" fill="#FEF9C3" font-family="monospace" font-size="11" font-weight="900" text-anchor="middle">[!] 07:00 早八生死局已拉响 [!]</text>
+            <text x="134" y="88" fill="#FFFFFF" font-family="monospace" font-size="40" font-weight="900" text-anchor="middle">07:00:08</text>
+            <text x="134" y="107" fill="#090D16" font-size="11" font-weight="900" text-anchor="middle">早八阿强 · 剩余保底押金 ¥47.00</text>
+            <!-- 实时滴血红包弹幕 -->
+            <rect x="14" y="124" width="240" height="34" rx="6" fill="#FACC15" stroke="#090D16" stroke-width="2.5"/>
+            <text x="134" y="145" fill="#090D16" font-size="11.2" font-weight="900" text-anchor="middle">¥ 犹豫超10s！已向 1号床老张 滴血 -¥1.00</text>
+            <!-- 逃跑滑块示意轨 -->
+            <rect x="14" y="166" width="240" height="72" rx="8" fill="#1E293B" stroke="#FACC15" stroke-width="2"/>
+            <rect x="24" y="175" width="122" height="18" rx="4" fill="#FACC15"/>
+            <text x="85" y="188" fill="#090D16" font-size="10" font-weight="900" text-anchor="middle">STEP1 安全栓 0.8s</text>
+            <text x="202" y="188" fill="#94A3B8" font-family="monospace" font-size="9.5" font-weight="800" text-anchor="middle">9.8G 引力倒吸</text>
+            <rect x="24" y="201" width="220" height="26" rx="13" fill="#090D16" stroke="#475569" stroke-width="2"/>
+            <path d="M98 214 L42 214" stroke="#EF4444" stroke-width="2.5" stroke-dasharray="4 3"/>
+            <polygon points="36,214 45,209 45,219" fill="#EF4444"/>
+            <circle cx="176" cy="214" r="11" fill="#EF4444" stroke="#FFFFFF" stroke-width="2"/>
+            <text x="176" y="218" fill="#FFFFFF" font-size="10" font-weight="900" text-anchor="middle">闪!</text>
+            <!-- 底部贪睡惩罚按钮 -->
+            <rect x="14" y="247" width="240" height="44" rx="8" fill="#0F172A" stroke="#EF4444" stroke-width="2.5" stroke-dasharray="6 3"/>
+            <text x="134" y="266" fill="#FCA5A5" font-size="11" font-weight="900" text-anchor="middle">想再睡5分钟？手打45字社死认怂书</text>
+            <text x="134" y="282" fill="#FACC15" font-family="monospace" font-size="9.5" font-weight="800" text-anchor="middle">[禁粘贴 Ctrl+V · 打错1字全清重来]</text>
+          </svg>
+        </div>
+      </section>
+
+      <!-- ==================== 3. 核心闭环：404寝室4人绑定 × ¥200押金流转 ==================== -->
+      <section>
+        <div class="section-header">
+          <div class="section-badge">
+            <span class="num">LOOP 01</span>
+            <span>自愿受虐 × 404寝室4人绑定 × ¥200押金内部零和流转</span>
+          </div>
+          <div class="section-note">肥水不流外人田 · 零平台抽成 · 熟人面子强锁留存</div>
+        </div>
+
+        <div class="loop-grid">
+          <div class="loop-diagram-card">
+            <svg viewBox="0 0 700 308" width="100%" height="100%" xmlns="http://www.w3.org/2000/svg">
+              <defs>
+                <marker id="arr-red" markerWidth="9" markerHeight="9" refX="7" refY="4.5" orient="auto">
+                  <path d="M0,0 L9,4.5 L0,9 Z" fill="#EF4444"/>
+                </marker>
+                <marker id="arr-green" markerWidth="9" markerHeight="9" refX="7" refY="4.5" orient="auto">
+                  <path d="M0,0 L9,4.5 L0,9 Z" fill="#16A34A"/>
+                </marker>
+              </defs>
+
+              <!-- 背景装饰框 -->
+              <rect x="4" y="4" width="692" height="300" rx="8" fill="#FAF8F2" stroke="#090D16" stroke-width="2.5"/>
+
+              <!-- 左侧横向突袭查岗虚线（1号床老张 -> 3号床小李） -->
+              <path d="M100 98 L100 194" stroke="#0F172A" stroke-width="3" stroke-dasharray="5 4" marker-end="url(#arr-red)"/>
+              <rect x="38" y="135" width="124" height="24" rx="4" fill="#FACC15" stroke="#090D16" stroke-width="2"/>
+              <text x="100" y="151" font-size="11" font-weight="900" fill="#090D16" text-anchor="middle">07:01 发起突袭查岗</text>
+
+              <!-- 四条资金流向折线（零遮挡开放走廊布局） -->
+              <!-- 1号床 老张（池 -> 老张：分红流出） -->
+              <path d="M270 118 L194 66" stroke="#16A34A" stroke-width="4" marker-end="url(#arr-green)"/>
+              <!-- 2号床 阿强（阿强 -> 池：贪睡滴血流入） -->
+              <path d="M512 66 L432 118" stroke="#EF4444" stroke-width="4" stroke-dasharray="7 4" marker-end="url(#arr-red)"/>
+              <!-- 3号床 小李（池 -> 小李：反杀分红流出） -->
+              <path d="M270 174 L194 226" stroke="#16A34A" stroke-width="4" marker-end="url(#arr-green)"/>
+              <!-- 4号床 阿伟（阿伟 -> 池：超时罚金流入） -->
+              <path d="M512 226 L432 174" stroke="#EF4444" stroke-width="4" stroke-dasharray="7 4" marker-end="url(#arr-red)"/>
+
+              <!-- 中央 404 公共契约金库 (x=270..430) -->
+              <rect x="270" y="92" width="160" height="112" rx="12" fill="#FACC15" stroke="#090D16" stroke-width="4"/>
+              <rect x="279" y="80" width="142" height="22" rx="5" fill="#090D16"/>
+              <text x="350" y="95" font-family="monospace" font-size="10.8" font-weight="900" fill="#FACC15" text-anchor="middle">404 封闭契约总池</text>
+              <text x="350" y="142" font-family="monospace" font-size="32" font-weight="900" fill="#090D16" text-anchor="middle">¥200.00</text>
+              <text x="350" y="164" font-size="11" font-weight="900" fill="#B91C1C" text-anchor="middle">4人 × ¥50.00 (20,000分)</text>
+              <text x="350" y="187" font-size="11" font-weight="800" fill="#0F172A" text-anchor="middle">早起瓜分 · 赖床出血</text>
+
+              <!-- 四个不遮挡金额胶囊标签（置于顶层） -->
+              <rect x="193" y="34" width="76" height="22" rx="4" fill="#DCFCE7" stroke="#16A34A" stroke-width="2"/>
+              <text x="231" y="49" font-size="10.8" font-weight="900" fill="#14532D" text-anchor="middle">头彩 +¥6.5</text>
+
+              <rect x="431" y="34" width="76" height="22" rx="4" fill="#FEE2E2" stroke="#EF4444" stroke-width="2"/>
+              <text x="469" y="49" font-size="10.8" font-weight="900" fill="#991B1B" text-anchor="middle">滴血 -¥3.0</text>
+
+              <rect x="193" y="232" width="76" height="22" rx="4" fill="#DCFCE7" stroke="#16A34A" stroke-width="2"/>
+              <text x="231" y="247" font-size="10.8" font-weight="900" fill="#14532D" text-anchor="middle">反杀 +¥6.5</text>
+
+              <rect x="431" y="232" width="76" height="22" rx="4" fill="#FEE2E2" stroke="#EF4444" stroke-width="2"/>
+              <text x="469" y="247" font-size="10.8" font-weight="900" fill="#991B1B" text-anchor="middle">违约 -¥10</text>
+
+              <!-- 1号床 卷王老张 (x=14..188) -->
+              <rect x="14" y="16" width="174" height="80" rx="8" fill="#0F172A" stroke="#090D16" stroke-width="3.5"/>
+              <rect x="24" y="25" width="66" height="20" rx="4" fill="#16A34A"/>
+              <text x="57" y="39" font-size="10.8" font-weight="900" fill="#FFFFFF" text-anchor="middle">1号床·已起</text>
+              <text x="142" y="40" font-family="monospace" font-size="12.5" font-weight="900" fill="#4ADE80" text-anchor="middle">¥56.50 ↑</text>
+              <text x="24" y="64" font-size="15.5" font-weight="900" fill="#FACC15">卷王老张</text>
+              <text x="24" y="83" font-size="11" font-weight="700" fill="#CBD5E1">06:58 秒过关 · 突袭收割机</text>
+
+              <!-- 2号床 早八阿强 (x=512..686) -->
+              <rect x="512" y="16" width="174" height="80" rx="8" fill="#FFFFFF" stroke="#090D16" stroke-width="3.5"/>
+              <rect x="522" y="25" width="66" height="20" rx="4" fill="#FACC15" stroke="#090D16" stroke-width="1.5"/>
+              <text x="555" y="39" font-size="10.8" font-weight="900" fill="#090D16" text-anchor="middle">2号床·破防</text>
+              <text x="640" y="40" font-family="monospace" font-size="12.5" font-weight="900" fill="#EF4444" text-anchor="middle">¥47.00 ↓</text>
+              <text x="522" y="64" font-size="15.5" font-weight="900" fill="#090D16">早八阿强</text>
+              <text x="522" y="83" font-size="11" font-weight="700" fill="#475569">手打社死认怂文错字滴血</text>
+
+              <!-- 3号床 回笼觉小李 (x=14..188) -->
+              <rect x="14" y="198" width="174" height="82" rx="8" fill="#FFFFFF" stroke="#090D16" stroke-width="3.5"/>
+              <rect x="24" y="207" width="72" height="20" rx="4" fill="#2563EB"/>
+              <text x="60" y="221" font-size="10.8" font-weight="900" fill="#FFFFFF" text-anchor="middle">3号床·反杀</text>
+              <text x="143" y="222" font-family="monospace" font-size="12.5" font-weight="900" fill="#16A34A" text-anchor="middle">¥56.50 ↑</text>
+              <text x="24" y="246" font-size="15.5" font-weight="900" fill="#090D16">回笼觉小李</text>
+              <text x="24" y="266" font-size="11" font-weight="700" fill="#475569">连线+挪车+晃动算术险胜</text>
+
+              <!-- 4号床 死睡阿伟 (x=512..686) -->
+              <rect x="512" y="198" width="174" height="82" rx="8" fill="#FEF2F2" stroke="#EF4444" stroke-width="3.5"/>
+              <rect x="522" y="207" width="72" height="20" rx="4" fill="#EF4444"/>
+              <text x="558" y="221" font-size="10.8" font-weight="900" fill="#FFFFFF" text-anchor="middle">4号床·死睡</text>
+              <text x="641" y="222" font-family="monospace" font-size="12.5" font-weight="900" fill="#B91C1C" text-anchor="middle">¥40.00 ↓</text>
+              <text x="522" y="246" font-size="15.5" font-weight="900" fill="#991B1B">死睡阿伟</text>
+              <text x="522" y="266" font-size="11" font-weight="800" fill="#B91C1C">404 早餐鸡腿首席赞助商</text>
+
+              <!-- 底部零和结算校验条（加宽至 312px 保证完整居中不裁切） -->
+              <rect x="194" y="264" width="312" height="30" rx="6" fill="#090D16"/>
+              <text x="350" y="283" font-family="monospace" font-size="11.5" font-weight="900" fill="#4ADE80" text-anchor="middle">✓ 56.50 + 47.00 + 56.50 + 40.00 ≡ ¥200.00</text>
+            </svg>
+          </div>
+
+          <!-- 右侧三大自洽逻辑支柱 -->
+          <div class="pillars-card">
+            <div class="pillar-item">
+              <div class="pillar-head"><span>支点 01</span> 零流量冷启动飞轮</div>
+              <p class="pillar-desc">抛弃百万日活陌生人对赌池，最小化锁定同屋 4 名室友。物理空间听得到闹钟，谁卸载谁请全寝喝奶茶。</p>
+            </div>
+            <div class="pillar-item">
+              <div class="pillar-head"><span>支点 02</span> 越讨厌 = 唤醒越彻底</div>
+              <p class="pillar-desc">专治闭眼肌肉记忆！滑块闪避、错字清空、乱序键盘逼迫前额叶强行开机——骂出声的那一刻已彻底清醒。</p>
+            </div>
+            <div class="pillar-item">
+              <div class="pillar-head"><span>支点 03</span> 损失厌恶即时兑现</div>
+              <p class="pillar-desc">丢 ¥5 不心疼，但亲眼看着自己的早饭钱变成对床老张碗里的双份卤鸡腿，杀伤力直接拉满 1000%。</p>
+            </div>
+            <div class="invariant-banner">
+              ∑ balanceCents + poolCents ≡ 20000 分
+            </div>
+          </div>
+        </div>
+      </section>
+
+      <!-- ==================== 4. 五大令人抓狂但 100% 可通关的逆向交互关卡 ==================== -->
+      <section>
+        <div class="section-header">
+          <div class="section-badge">
+            <span class="num">ANTI-UX × 5</span>
+            <span>五大令人抓狂但 100% 可通关的逆向交互关卡</span>
+          </div>
+          <div class="section-note">恶意折磨 ≠ 劣质死局 · 每关均设透明规律与确定性通路</div>
+        </div>
+
+        <!-- 第一排：两大高频破防主机制（横向图文宽卡） -->
+        <div class="mech-top-row">
+          <!-- 关卡 01 -->
+          <article class="mech-card wide">
+            <div class="mech-visual">
+              <svg viewBox="0 0 190 126" width="100%" height="100%" xmlns="http://www.w3.org/2000/svg">
+                <rect x="8" y="12" width="174" height="24" rx="5" fill="#FACC15" stroke="#090D16" stroke-width="2.5"/>
+                <text x="95" y="28" font-size="11" font-weight="900" fill="#090D16" text-anchor="middle">[LOCK] 防梦游安全栓 0.8s</text>
+                <rect x="10" y="50" width="170" height="34" rx="17" fill="#0F172A" stroke="#090D16" stroke-width="2.5"/>
+                <!-- 重力回吸箭头 -->
+                <path d="M98 67 L28 67" stroke="#EF4444" stroke-width="3" stroke-dasharray="5 3"/>
+                <polygon points="24,67 34,61 34,73" fill="#EF4444"/>
+                <!-- 闪避滑块 -->
+                <circle cx="138" cy="67" r="14" fill="#EF4444" stroke="#FFFFFF" stroke-width="2.5"/>
+                <text x="138" y="71" font-size="10" font-weight="900" fill="#FFFFFF" text-anchor="middle">躲!</text>
+                <text x="95" y="108" font-size="11" font-weight="900" fill="#B91C1C" text-anchor="middle">松手触发 9.8G 万有引力倒吸归零</text>
+              </svg>
+            </div>
+            <div>
+              <div class="mech-head">
+                <h3 class="mech-title">逃跑滑块 + 松手倒退打卡</h3>
+                <span class="mech-idx">关卡 01</span>
+              </div>
+              <p class="mech-pain">未解锁盲扑时滑块沿轨随机弹跳闪避并贴脸嘲讽；猛甩超速判定“脱轨”，中途松手立即以 9.8G 重力加速倒退归零。</p>
+              <div class="mech-pass">✓ 通关规律：长按安全栓满 0.8s → 1.5~3s 匀速推底驻留 0.5s</div>
+            </div>
+          </article>
+
+          <!-- 关卡 02 -->
+          <article class="mech-card wide">
+            <div class="mech-visual">
+              <svg viewBox="0 0 190 126" width="100%" height="100%" xmlns="http://www.w3.org/2000/svg">
+                <rect x="10" y="10" width="84" height="24" rx="4" fill="#FEE2E2" stroke="#EF4444" stroke-width="2"/>
+                <text x="52" y="26" font-family="monospace" font-size="10.8" font-weight="900" fill="#B91C1C" text-anchor="middle">NO Ctrl+V</text>
+                <rect x="100" y="10" width="80" height="24" rx="4" fill="#090D16"/>
+                <text x="140" y="26" font-family="monospace" font-size="11" font-weight="900" fill="#FACC15" text-anchor="middle">-¥1 / 10s</text>
+                <rect x="10" y="42" width="170" height="48" rx="6" fill="#FFFFFF" stroke="#090D16" stroke-width="2.5"/>
+                <text x="18" y="61" font-size="10.5" font-weight="800" fill="#16A34A">“我阿强承认起床最菜，</text>
+                <text x="18" y="79" font-size="10.5" font-weight="800" fill="#EF4444">自愿给老张加鸡腿。” ←错标点!</text>
+                <rect x="10" y="96" width="170" height="22" rx="4" fill="#EF4444"/>
+                <text x="95" y="111" font-size="10.5" font-weight="900" fill="#FFFFFF" text-anchor="middle">× 错1字整段瞬间清零重打！</text>
+              </svg>
+            </div>
+            <div>
+              <div class="mech-head">
+                <h3 class="mech-title">禁粘贴手打社死认怂贪睡</h3>
+                <span class="mech-idx">关卡 02</span>
+              </div>
+              <p class="mech-pain">想贪睡 5 分钟？彻底封死粘贴（企图粘贴直接换更羞耻长句），含全角标点错一字整段清空，每犹豫 10s 滴血扣 ¥1！</p>
+              <div class="mech-pass">✓ 通关规律：跟随逐字高亮提示手打完整宣言（兼容中文输入法）</div>
+            </div>
+          </article>
+        </div>
+
+        <!-- 第二排：三大深度核验与互坑关卡（三列精致卡片） -->
+        <div class="mech-bottom-row">
+          <!-- 关卡 03 -->
+          <article class="mech-card">
+            <div>
+              <div class="mech-visual">
+                <svg viewBox="0 0 310 108" width="100%" height="100%" xmlns="http://www.w3.org/2000/svg">
+                  <rect x="12" y="12" width="132" height="84" rx="8" fill="#0F172A" stroke="#090D16" stroke-width="2.5"/>
+                  <text x="78" y="34" font-family="monospace" font-size="11" font-weight="900" fill="#EF4444" text-anchor="middle">[!] 老张突袭 ¥10</text>
+                  <text x="78" y="60" font-family="monospace" font-size="17" font-weight="900" fill="#FACC15" text-anchor="middle">37 × 3 - 19</text>
+                  <text x="78" y="82" font-size="10.5" font-weight="800" fill="#CBD5E1" text-anchor="middle">每按1键 0-9 洗牌</text>
+                  <!-- 摇摆乱序数字键 -->
+                  <g transform="translate(158, 10) rotate(-4 68 44)">
+                    <rect x="0" y="0" width="42" height="26" rx="4" fill="#FACC15" stroke="#090D16" stroke-width="2"/>
+                    <text x="21" y="18" font-family="monospace" font-size="14" font-weight="900" text-anchor="middle">7</text>
+                    <rect x="47" y="0" width="42" height="26" rx="4" fill="#FFFFFF" stroke="#090D16" stroke-width="2"/>
+                    <text x="68" y="18" font-family="monospace" font-size="14" font-weight="900" text-anchor="middle">2</text>
+                    <rect x="94" y="0" width="42" height="26" rx="4" fill="#FACC15" stroke="#090D16" stroke-width="2"/>
+                    <text x="115" y="18" font-family="monospace" font-size="14" font-weight="900" text-anchor="middle">9</text>
+                    <rect x="0" y="31" width="42" height="26" rx="4" fill="#FFFFFF" stroke="#090D16" stroke-width="2"/>
+                    <text x="21" y="49" font-family="monospace" font-size="14" font-weight="900" text-anchor="middle">0</text>
+                    <rect x="47" y="31" width="42" height="26" rx="4" fill="#EF4444" stroke="#090D16" stroke-width="2"/>
+                    <text x="68" y="49" font-family="monospace" font-size="14" font-weight="900" fill="#FFF" text-anchor="middle">5</text>
+                    <rect x="94" y="31" width="42" height="26" rx="4" fill="#FFFFFF" stroke="#090D16" stroke-width="2"/>
+                    <text x="115" y="49" font-family="monospace" font-size="14" font-weight="900" text-anchor="middle">1</text>
+                    <rect x="0" y="62" width="136" height="24" rx="4" fill="#090D16"/>
+                    <text x="68" y="78" font-size="10.5" font-weight="900" fill="#FACC15" text-anchor="middle">⇄ 正弦摇摆动态重排</text>
+                  </g>
+                </svg>
+              </div>
+              <div class="mech-head">
+                <h3 class="mech-title">室友突袭 + 晃动乱序算术</h3>
+                <span class="mech-idx">关卡 03</span>
+              </div>
+              <p class="mech-pain">清醒室友随时发起 ¥10 突袭查岗！数字键盘持续摇晃且每按一键立即重新洗牌，彻底废除盲打。</p>
+            </div>
+            <div class="mech-pass">✓ 看清新键位连对 2 道算术题即反杀保本</div>
+          </article>
+
+          <!-- 关卡 04 -->
+          <article class="mech-card">
+            <div>
+              <div class="mech-visual">
+                <svg viewBox="0 0 310 108" width="100%" height="100%" xmlns="http://www.w3.org/2000/svg">
+                  <!-- 5x4 示意配电网格 -->
+                  <g transform="translate(22, 8)">
+                    <rect x="0" y="0" width="124" height="92" fill="#0F172A" stroke="#090D16" stroke-width="2.5" rx="6"/>
+                    <path d="M31 0 V92 M62 0 V92 M93 0 V92 M0 23 H124 M0 46 H124 M0 69 H124" stroke="#334155" stroke-width="1"/>
+                    <path d="M15 12 H108 V35" fill="none" stroke="#FACC15" stroke-width="5" stroke-linecap="round" stroke-linejoin="round"/>
+                    <circle cx="15" cy="12" r="6" fill="#FACC15"/><circle cx="108" cy="35" r="6" fill="#FACC15"/>
+                    <path d="M15 80 H108 V58" fill="none" stroke="#4ADE80" stroke-width="5" stroke-linecap="round" stroke-linejoin="round"/>
+                    <circle cx="15" cy="80" r="6" fill="#4ADE80"/><circle cx="108" cy="58" r="6" fill="#4ADE80"/>
+                    <path d="M46 12 V58 H78" fill="none" stroke="#EF4444" stroke-width="5" stroke-dasharray="5 3" stroke-linecap="round"/>
+                    <circle cx="46" cy="12" r="6" fill="#EF4444"/><circle cx="78" cy="58" r="6" fill="#EF4444"/>
+                  </g>
+                  <rect x="158" y="16" width="138" height="76" rx="6" fill="#FEF2F2" stroke="#EF4444" stroke-width="2.5"/>
+                  <text x="227" y="38" font-size="12" font-weight="900" fill="#B91C1C" text-anchor="middle">[!] 触电短路双崩！</text>
+                  <text x="227" y="57" font-size="10.5" font-weight="800" fill="#1E293B" text-anchor="middle">误碰异色线两根齐断</text>
+                  <text x="227" y="76" font-family="monospace" font-size="11" font-weight="900" fill="#16A34A" text-anchor="middle">30-60s 清醒大考</text>
+                </svg>
+              </div>
+              <div class="mech-head">
+                <h3 class="mech-title">30–60s 同色不交叉连线</h3>
+                <span class="mech-idx">关卡 04</span>
+              </div>
+              <p class="mech-pain">5×5 / 6×6 配电箱电极两两相连，严禁路径交叉；一旦误触异色线立即触发短路双崩清零并扣 ¥0.50。</p>
+            </div>
+            <div class="mech-pass">✓ 内置 DFS 回溯求解器验证 100% 确定可解</div>
+          </article>
+
+          <!-- 关卡 05 -->
+          <article class="mech-card">
+            <div>
+              <div class="mech-visual">
+                <svg viewBox="0 0 310 108" width="100%" height="100%" xmlns="http://www.w3.org/2000/svg">
+                  <g transform="translate(18, 8)">
+                    <rect x="0" y="0" width="136" height="92" rx="6" fill="#E2E8F0" stroke="#090D16" stroke-width="2.5"/>
+                    <rect x="130" y="32" width="10" height="26" fill="#16A34A"/>
+                    <rect x="10" y="10" width="52" height="18" rx="4" fill="#3B82F6" stroke="#090D16" stroke-width="2"/>
+                    <rect x="82" y="10" width="20" height="50" rx="4" fill="#FACC15" stroke="#090D16" stroke-width="2"/>
+                    <rect x="108" y="44" width="20" height="38" rx="4" fill="#64748B" stroke="#090D16" stroke-width="2"/>
+                    <rect x="16" y="35" width="58" height="22" rx="5" fill="#EF4444" stroke="#090D16" stroke-width="2.5"/>
+                    <text x="45" y="50" font-size="10" font-weight="900" fill="#FFFFFF" text-anchor="middle">早八驴▶</text>
+                    <rect x="28" y="66" width="48" height="18" rx="4" fill="#10B981" stroke="#090D16" stroke-width="2"/>
+                  </g>
+                  <rect x="166" y="16" width="130" height="76" rx="6" fill="#FFFBEB" stroke="#090D16" stroke-width="2.5"/>
+                  <text x="231" y="38" font-size="12" font-weight="900" fill="#090D16" text-anchor="middle">▲ 零刮擦容忍！</text>
+                  <text x="231" y="57" font-size="10.5" font-weight="800" fill="#B91C1C" text-anchor="middle">擦碰即宿管咆哮退回</text>
+                  <text x="231" y="76" font-family="monospace" font-size="11" font-weight="900" fill="#16A34A" text-anchor="middle">最优 10~14 步出库</text>
+                </svg>
+              </div>
+              <div class="mech-head">
+                <h3 class="mech-title">30–60s 无碰撞挪车出库</h3>
+                <span class="mech-idx">关卡 05</span>
+              </div>
+              <p class="mech-pain">6×6 早高峰车棚平移违停电瓶车护送【早八驴】驶出 EXIT；轻微擦碰即震动赌气弹回原位并扣 ¥0.50！</p>
+            </div>
+            <div class="mech-pass">✓ 经 BFS 最短路求解器验证，支持微调键通关</div>
+          </article>
+        </div>
+      </section>
+
+      <!-- ==================== 5. 底部硬核工程背书与局域网扫码联机 ==================== -->
+      <footer class="footer-grid">
+        <div class="eng-box">
+          <div class="eng-title-row">
+            <span class="eng-title">⚙ 硬核工程底座 · 绝不用劣质 Bug 冒充逆向设计</span>
+            <span class="dify-tag">Dify Workflow 初稿生成 × 深度视觉精修</span>
+          </div>
+          <div class="eng-badges">
+            <div class="eng-item">
+              <strong>精确到“分”资金守恒</strong>
+              <p>全链路整数分运算 + 状态迁移实时断言，高并发联机下 ¥200.00 分毫不差零穿仓。</p>
+            </div>
+            <div class="eng-item">
+              <strong>DFS / BFS 求解器验算</strong>
+              <p>内置连线与挪车关卡全部通过独立算法求解器自动化测试验证，30–60s 必可解。</p>
+            </div>
+            <div class="eng-item">
+              <strong>契约总控台 + 四机同屏</strong>
+              <p>支持单页四机同屏实时联动与时段切换，亦支持 WebSocket 局域网 4 部手机扫码互坑。</p>
+            </div>
+          </div>
+        </div>
+
+        <div class="lan-box">
+          <div class="qr-card">
+            <svg viewBox="0 0 100 100" width="96" height="96" xmlns="http://www.w3.org/2000/svg">
+              <rect width="100" height="100" fill="#FFFFFF"/>
+              <path d="M8,8 h26 v26 h-26 z M13,13 v16 h16 v-16 z M17,17 h8 v8 h-8 z" fill="#090D16"/>
+              <path d="M66,8 h26 v26 h-26 z M71,13 v16 h16 v-16 z M75,17 h8 v8 h-8 z" fill="#090D16"/>
+              <path d="M8,66 h26 v26 h-26 z M13,71 v16 h16 v-16 z M17,75 h8 v8 h-8 z" fill="#090D16"/>
+              <g fill="#090D16">
+                <rect x="40" y="10" width="6" height="6"/><rect x="52" y="10" width="8" height="6"/>
+                <rect x="40" y="22" width="12" height="6"/><rect x="56" y="22" width="6" height="12"/>
+                <rect x="10" y="40" width="12" height="6"/><rect x="28" y="40" width="6" height="12"/>
+                <rect x="10" y="52" width="6" height="8"/><rect x="20" y="54" width="10" height="6"/>
+                <rect x="68" y="40" width="10" height="6"/><rect x="84" y="40" width="8" height="12"/>
+                <rect x="70" y="54" width="14" height="6"/><rect x="42" y="68" width="12" height="6"/>
+                <rect x="60" y="68" width="8" height="10"/><rect x="74" y="68" width="18" height="6"/>
+                <rect x="40" y="80" width="8" height="12"/><rect x="54" y="84" width="16" height="8"/>
+                <rect x="76" y="78" width="8" height="14"/><rect x="86" y="84" width="6" height="8"/>
+              </g>
+              <rect x="36" y="36" width="28" height="28" rx="4" fill="#EF4444" stroke="#090D16" stroke-width="3"/>
+              <text x="50" y="54" font-family="monospace" font-size="12" font-weight="900" fill="#FFFFFF" text-anchor="middle">404</text>
+            </svg>
+          </div>
+          <div class="lan-copy">
+            <h4>局域网手机扫码实时联机</h4>
+            <p>桌面端开启「404 寝室契约总控台」，手机扫床位码即刻绑定床位发起突袭查岗！</p>
+            <span class="lan-pill">HTTP + WebSocket 毫秒级同步</span>
+          </div>
+        </div>
+      </footer>
+    </div>
+
+    <!-- 底部防爆警戒斜纹 -->
+    <div class="hazard-bar bottom"></div>
+  </div>
+</body>
+</html>

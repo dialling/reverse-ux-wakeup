@@ -1,5 +1,5 @@
 import { useCallback, useEffect, useMemo, useRef, useState } from 'react';
-import { dormReducer } from './dormEngine';
+import { DEFAULT_WAKE_TIME, dormReducer, isValidHHMM } from './dormEngine';
 import { getStoryActById } from './storyActs';
 import { DormAction, DormState, ROOMMATE_IDS, RoommateId } from '../types/dorm';
 
@@ -8,6 +8,17 @@ export type SyncMode = 'local' | 'lan';
 export type ViewMode = 'director' | 'quad' | 'single';
 
 export type ConnectionStatus = 'standalone' | 'connecting' | 'connected' | 'offline_fallback';
+
+interface WakeupInjectedRuntime {
+  webPort?: number;
+  syncPort?: number;
+}
+
+function getInjectedRuntime(): WakeupInjectedRuntime | undefined {
+  if (typeof window === 'undefined') return undefined;
+  return (window as unknown as { __WAKEUP_RUNTIME__?: WakeupInjectedRuntime })
+    .__WAKEUP_RUNTIME__;
+}
 
 export function parseInitialViewMode(): ViewMode {
   if (typeof window !== 'undefined') {
@@ -45,6 +56,7 @@ export interface UrlBootParams {
   initialRole: RoommateId;
   forceMobileView: boolean;
   initialActId: number;
+  initialWakeTime: string;
   requestedMode: 'auto' | 'lan' | 'local';
   wsPort: number;
 }
@@ -55,6 +67,7 @@ export function parseUrlBootParams(): UrlBootParams {
       initialRole: 'qiang',
       forceMobileView: false,
       initialActId: 1,
+      initialWakeTime: DEFAULT_WAKE_TIME,
       requestedMode: 'auto',
       wsPort: 5174,
     };
@@ -73,12 +86,19 @@ export function parseUrlBootParams(): UrlBootParams {
   const actParam = Number(params.get('act') || '1');
   const initialActId = actParam >= 1 && actParam <= 5 ? Math.trunc(actParam) : 1;
 
+  const wakeParam = params.get('wakeTime');
+  const initialWakeTime = isValidHHMM(wakeParam) ? wakeParam.trim() : DEFAULT_WAKE_TIME;
+
   const modeParam = params.get('mode');
   const requestedMode: 'auto' | 'lan' | 'local' =
     modeParam === 'lan' ? 'lan' : modeParam === 'local' ? 'local' : 'auto';
 
+  const injected = getInjectedRuntime();
   const wsPortParam = Number(
-    params.get('wsPort') || import.meta.env.VITE_SYNC_PORT || '5174'
+    params.get('wsPort') ||
+      injected?.syncPort ||
+      import.meta.env.VITE_SYNC_PORT ||
+      '5174'
   );
   const wsPort = Number.isFinite(wsPortParam) && wsPortParam > 0 ? wsPortParam : 5174;
 
@@ -86,6 +106,7 @@ export function parseUrlBootParams(): UrlBootParams {
     initialRole,
     forceMobileView,
     initialActId,
+    initialWakeTime,
     requestedMode,
     wsPort,
   };
@@ -96,6 +117,7 @@ function isFileProtocol(): boolean {
 }
 
 function buildFallbackLanInfo(wsPort: number): LanServerInfo {
+  const injected = getInjectedRuntime();
   const host =
     typeof window !== 'undefined' && window.location.hostname
       ? window.location.hostname
@@ -103,7 +125,7 @@ function buildFallbackLanInfo(wsPort: number): LanServerInfo {
   const webPort =
     typeof window !== 'undefined' && window.location.port
       ? Number(window.location.port)
-      : 5173;
+      : injected?.webPort || 5173;
   const origin =
     typeof window !== 'undefined' &&
     !isFileProtocol() &&
@@ -151,7 +173,9 @@ export function useDormSyncController() {
   );
 
   const [dormState, setDormState] = useState<DormState>(() =>
-    getStoryActById(boot.initialActId).buildState()
+    getStoryActById(boot.initialActId, boot.initialWakeTime).buildState(
+      boot.initialWakeTime
+    )
   );
 
   const dormStateRef = useRef<DormState>(dormState);
@@ -165,8 +189,9 @@ export function useDormSyncController() {
 
   const fetchLanServerInfo = useCallback(async (): Promise<LanServerInfo | null> => {
     if (typeof window === 'undefined') return null;
+    const injected = getInjectedRuntime();
     const host = window.location.hostname || '127.0.0.1';
-    const currentWebPort = window.location.port || '5173';
+    const currentWebPort = window.location.port || String(injected?.webPort || 5173);
     const controller = new AbortController();
     const timer = window.setTimeout(() => controller.abort(), 1200);
 
@@ -191,9 +216,6 @@ export function useDormSyncController() {
     }
   }, [boot.wsPort]);
 
-  // 初次探测局域网同步服务：
-  // - HTTP/HTTPS 下若探测到 :5174 在线且未强制指定 local，自动进入局域网联机同步；
-  // - file:// 双击即玩模式下默认稳居「单机剧本导播模式」（同时静默探测本地 :5174，若在线则标记联机就绪并支持一键切换联机，离线亦零报错零重试）。
   useEffect(() => {
     let cancelled = false;
     (async () => {
@@ -214,7 +236,6 @@ export function useDormSyncController() {
     };
   }, [boot.requestedMode, fetchLanServerInfo]);
 
-  // 同浏览器多标签页应急同步通道（即使未启动 syncServer 也可多窗口联动演示；兼容 file:// 沙箱限制）
   useEffect(() => {
     if (typeof window === 'undefined' || typeof BroadcastChannel === 'undefined') {
       return;
@@ -230,7 +251,6 @@ export function useDormSyncController() {
     channel.onmessage = (ev) => {
       const msg = ev.data;
       if (!msg || msg.sourceClientId === clientIdRef.current) return;
-      // 仅当处于联机模式但未连上 WebSocket 服务端时，使用 BroadcastChannel 兜底同步
       if (syncMode === 'lan' && (!wsRef.current || wsRef.current.readyState !== WebSocket.OPEN)) {
         if (msg.type === 'TAB_STATE_SYNC' && msg.state) {
           setDormState(msg.state);
@@ -248,7 +268,6 @@ export function useDormSyncController() {
     };
   }, [syncMode]);
 
-  // WebSocket 联机连接生命周期管理
   useEffect(() => {
     if (typeof window === 'undefined') return;
 
@@ -438,8 +457,9 @@ export function useDormSyncController() {
 
   const jumpToStoryAct = useCallback(
     (actId: number, switchRole = true) => {
-      const act = getStoryActById(actId);
-      const presetState = act.buildState();
+      const currentWake = dormStateRef.current.targetWakeTime || DEFAULT_WAKE_TIME;
+      const act = getStoryActById(actId, currentWake);
+      const presetState = act.buildState(currentWake);
       dispatchAction({ type: 'LOAD_PRESET_STATE', presetState });
       if (switchRole) {
         setActiveRole(act.recommendedRole);

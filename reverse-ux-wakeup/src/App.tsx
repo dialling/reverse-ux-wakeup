@@ -94,10 +94,10 @@ function DirectorAndSingleWorkspace({
             <div>
               <div className="flex items-center gap-2">
                 <h1 className="text-base font-black tracking-tight text-white sm:text-lg">
-                  《醒醒！分钱了》Snooze &amp; Lose
+                  《醒醒！分钱了》Rise &amp; Fine
                 </h1>
                 <span className="rounded-full border border-red-500/40 bg-red-500/15 px-2.5 py-0.5 text-[11px] font-bold text-red-300">
-                  逆向 UX 早起押金契约
+                  404 寝室早起押金契约
                 </span>
               </div>
               <p className="text-xs text-slate-400">
@@ -113,20 +113,19 @@ function DirectorAndSingleWorkspace({
               onClick={() => setForceMobileView(true)}
               className="flex items-center gap-1.5 rounded-xl border border-slate-700 bg-slate-900 px-3 py-1.5 text-xs font-bold text-slate-300 hover:border-[#FACC15] hover:text-[#FACC15]"
             >
-              <Smartphone className="h-3.5 w-3.5" /> 纯手机全屏预览
+              <Smartphone className="h-3.5 w-3.5" /> 沉浸手机全屏
             </button>
           </div>
         </header>
       )}
 
-      {/* Floating Desktop Restore Button when previewing mobile=1 on wide desktop */}
       {forceMobileView && !isNarrowScreen && (
         <button
           type="button"
           onClick={() => setForceMobileView(false)}
           className="fixed right-4 bottom-4 z-50 flex items-center gap-1.5 rounded-full border border-[#FACC15]/60 bg-slate-900/95 px-3.5 py-2 text-xs font-bold text-[#FACC15] shadow-xl backdrop-blur hover:bg-slate-800"
         >
-          <Monitor className="h-3.5 w-3.5" /> 展开上帝导播台
+          <Monitor className="h-3.5 w-3.5" /> 展开寝室总控台
         </button>
       )}
 

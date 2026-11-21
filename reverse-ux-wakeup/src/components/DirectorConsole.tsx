@@ -3,11 +3,11 @@ import QRCode from 'qrcode';
 import {
   BellRing,
   CheckCircle2,
+  Clock,
   Copy,
   Crosshair,
   ExternalLink,
   Eye,
-  Film,
   QrCode,
   Radio,
   ReceiptText,
@@ -21,14 +21,15 @@ import {
 import {
   assertMoneyConservation,
   canBeRaided,
+  DEFAULT_WAKE_TIME,
   formatSignedYuan,
   formatYuan,
   getStatusLabel,
 } from '../core/dormEngine';
-import { STORY_ACTS } from '../core/storyActs';
+import { getStoryActsForWakeTime } from '../core/storyActs';
 import { ConnectionStatus, LanServerInfo, SyncMode } from '../core/syncClient';
 import { DormAction, DormState, ROOMMATE_IDS, RoommateId } from '../types/dorm';
-import { getMountedMechanismCount } from './MechanismSlot';
+import { WakeTimePicker } from './WakeTimePicker';
 
 interface DirectorConsoleProps {
   dormState: DormState;
@@ -60,7 +61,8 @@ export function DirectorConsole({
   onOpenSettlement,
 }: DirectorConsoleProps) {
   const conservation = useMemo(() => assertMoneyConservation(dormState), [dormState]);
-  const mountedMechCount = getMountedMechanismCount();
+  const wakeTime = dormState.targetWakeTime || DEFAULT_WAKE_TIME;
+  const dynamicActs = useMemo(() => getStoryActsForWakeTime(wakeTime), [wakeTime]);
 
   const [customHost, setCustomHost] = useState<string>('');
   const [qrDataUrls, setQrDataUrls] = useState<Partial<Record<RoommateId, string>>>({});
@@ -108,14 +110,12 @@ export function DirectorConsole({
   }, [roleMobileLinks]);
 
   const handleDirectorRaid = (targetId: RoommateId) => {
-    // 优先选一位已清醒且非目标本人的室友作为突袭发起人；若暂无清醒室友，默认由老张（或阿强）发起
     const awakeRaider = ROOMMATE_IDS.find(
       (id) => id !== targetId && dormState.roommates[id].status === 'awake'
     );
     const fallbackRaider: RoommateId = targetId === 'zhang' ? 'qiang' : 'zhang';
     const raiderId = awakeRaider ?? fallbackRaider;
 
-    // 若目标正处于 awake，先置入眯眼回笼觉以便现场立即演示突袭
     if (!canBeRaided(dormState.roommates[targetId].status)) {
       onDispatch({
         type: 'ENTER_RELAPSE_SLEEP',
@@ -154,19 +154,19 @@ export function DirectorConsole({
 
   return (
     <div className="flex flex-col gap-4 rounded-3xl border border-slate-800 bg-[#0F172A]/95 p-5 shadow-2xl">
-      {/* Top Console Banner */}
+      {/* Top Center Banner */}
       <div className="flex flex-wrap items-center justify-between gap-3 border-b border-slate-800 pb-4">
         <div>
           <div className="flex items-center gap-2">
             <span className="rounded-md bg-[#FACC15] px-2 py-0.5 text-[11px] font-black tracking-wider text-slate-950 uppercase">
-              DIRECTOR CONSOLE
+              DORM-404 CENTER
             </span>
             <h2 className="text-lg font-black tracking-tight text-white">
-              404 寝室上帝导播切换台
+              404 寝室契约总控台
             </h2>
           </div>
           <p className="mt-1 text-xs text-slate-400">
-            实时透视 4 人押金池守恒账本 · 一键推进五幕答辩故事 · 局域网真机扫码上号
+            4 人押金池实时清算账本 · 起床闹钟自由设定 · 局域网手机扫码绑定床位
           </p>
         </div>
 
@@ -183,7 +183,7 @@ export function DirectorConsole({
               }`}
             >
               <Sparkles className="h-3.5 w-3.5" />
-              单机剧本模式
+              本机独立运行
             </button>
             <button
               type="button"
@@ -213,7 +213,7 @@ export function DirectorConsole({
               ? `WS已同步 (${lanInfo.connectedClients}端在线)`
               : serverOnline
                 ? `联机服务就绪 (:${lanInfo.syncPort})`
-                : '纯本地零依赖引擎'}
+                : '本机离线清算引擎'}
           </span>
         </div>
       </div>
@@ -230,7 +230,7 @@ export function DirectorConsole({
                 刚性资金守恒不变量校验通过
               </span>
               <span className="rounded bg-emerald-500/20 px-1.5 py-0.5 font-mono text-[10px] font-bold text-emerald-300">
-                REV #{dormState.revision} · 机制槽位 {mountedMechCount}/5
+                REV #{dormState.revision} · 五重防赖床核验已启用
               </span>
             </div>
             <div className="mt-0.5 font-mono text-xs text-slate-300">
@@ -256,12 +256,12 @@ export function DirectorConsole({
             onClick={() =>
               onDispatch({
                 type: 'SIGN_ALL_AND_START_ALARM',
-                clock: '07:00',
+                clock: wakeTime,
               })
             }
             className="flex items-center gap-1 rounded-xl border border-red-500/50 bg-red-500/15 px-3 py-2 text-xs font-bold text-red-300 hover:bg-red-500/25"
           >
-            <BellRing className="h-3.5 w-3.5" /> 全寝拉响 07:00 闹钟
+            <BellRing className="h-3.5 w-3.5" /> 全寝拉响 {wakeTime} 闹钟
           </button>
           <button
             type="button"
@@ -289,18 +289,30 @@ export function DirectorConsole({
         </div>
       </div>
 
-      {/* Section 1: 5-Act Pitch Story Switcher */}
+      {/* Custom Wake-Up Alarm Time Selector */}
+      <WakeTimePicker
+        value={wakeTime}
+        onChange={(nextWakeTime) =>
+          onDispatch({
+            type: 'SET_WAKE_TIME',
+            targetWakeTime: nextWakeTime,
+          })
+        }
+        variant="console"
+      />
+
+      {/* Section 1: Morning Key Moments Switcher */}
       <div>
         <div className="mb-2 flex items-center justify-between">
           <span className="flex items-center gap-1.5 text-xs font-extrabold tracking-wider text-slate-300 uppercase">
-            <Film className="h-4 w-4 text-[#FACC15]" /> 五幕式答辩路演剧本快进器（一键切幕）
+            <Clock className="h-4 w-4 text-[#FACC15]" /> 清晨契约关键时刻（时段切换）
           </span>
-          <span className="text-[11px] text-slate-400">
-            当前：{dormState.currentClock} · 第 {dormState.currentActId} 幕
+          <span className="font-mono text-[11px] text-slate-400">
+            契约闹钟：{wakeTime} · 当前寝室时刻：{dormState.currentClock}
           </span>
         </div>
         <div className="grid grid-cols-1 gap-2 sm:grid-cols-5">
-          {STORY_ACTS.map((act) => {
+          {dynamicActs.map((act) => {
             const isCurrent = dormState.currentActId === act.actId;
             return (
               <button
@@ -322,14 +334,14 @@ export function DirectorConsole({
                           : 'bg-slate-800 text-slate-300'
                       }`}
                     >
-                      ACT {act.actId} · {act.clock}
+                      {act.clock}
                     </span>
                     <span className="text-[10px] font-semibold text-slate-400">
-                      视角:{dormState.roommates[act.recommendedRole].shortName}
+                      床位:{dormState.roommates[act.recommendedRole].shortName}
                     </span>
                   </div>
                   <div className="mt-1.5 text-xs font-extrabold text-white">
-                    {act.shortTitle}
+                    {act.title}
                   </div>
                   <p className="mt-1 line-clamp-2 text-[10px] leading-snug text-slate-400">
                     {act.subtitle}
@@ -341,14 +353,14 @@ export function DirectorConsole({
         </div>
       </div>
 
-      {/* Section 2: 4 Roommates Live Status & Perspective Switcher */}
+      {/* Section 2: 4 Roommates Live Status & Terminal Switcher */}
       <div>
         <div className="mb-2 flex items-center justify-between">
           <span className="flex items-center gap-1.5 text-xs font-extrabold tracking-wider text-slate-300 uppercase">
-            <Eye className="h-4 w-4 text-[#FACC15]" /> 404 寝室四人实时账本 & 手机视角切换
+            <Eye className="h-4 w-4 text-[#FACC15]" /> 404 寝室四人实时账本 & 床位终端切换
           </span>
           <span className="text-[11px] text-slate-400">
-            点击任意室友卡片即可在左侧手机屏接管操作
+            点击室友卡片切换左侧手机床位终端
           </span>
         </div>
 
@@ -388,7 +400,7 @@ export function DirectorConsole({
                       </span>
                       {isSelected && (
                         <span className="rounded bg-[#FACC15]/20 px-1.5 py-0.5 text-[10px] font-bold text-[#FACC15]">
-                          当前手机视角
+                          当前床位终端
                         </span>
                       )}
                       {mobileCount > 0 && (
@@ -447,7 +459,7 @@ export function DirectorConsole({
                   {r.lastActionNote}
                 </p>
 
-                {/* Director Manual Triggers */}
+                {/* Manual Action Triggers */}
                 <div
                   className="mt-2.5 flex flex-wrap gap-1.5"
                   onClick={(e) => e.stopPropagation()}
@@ -478,7 +490,7 @@ export function DirectorConsole({
                     }}
                     className="rounded-lg border border-sky-500/40 bg-sky-500/10 px-2 py-1 text-[11px] font-bold text-sky-300 hover:bg-sky-500/20"
                   >
-                    直达小游戏关
+                    直达清醒核验
                   </button>
                   <button
                     type="button"
@@ -499,7 +511,7 @@ export function DirectorConsole({
                       }
                       className="flex items-center gap-0.5 rounded-lg border border-emerald-500/40 bg-emerald-500/10 px-2 py-1 text-[11px] font-bold text-emerald-300 hover:bg-emerald-500/20"
                     >
-                      <CheckCircle2 className="h-3 w-3" /> 秒醒打卡
+                      <CheckCircle2 className="h-3 w-3" /> 清醒打卡
                     </button>
                   )}
                 </div>
@@ -515,10 +527,10 @@ export function DirectorConsole({
           <div>
             <div className="flex items-center gap-1.5 text-xs font-extrabold text-white">
               <QrCode className="h-4 w-4 text-[#FACC15]" />
-              局域网真机扫码上号（4 床位独立全屏视图）
+              局域网手机扫码绑定床位（4 床位独立全屏终端）
             </div>
             <p className="mt-0.5 text-[11px] text-slate-400">
-              同一 Wi-Fi / 热点下手机扫码即自动进入对应室友全屏模式（`?role=xxx&amp;mobile=1`）并毫秒级同步账本
+              同一 Wi-Fi / 热点下手机扫码即自动进入对应床位全屏终端并毫秒级同步账本
             </p>
           </div>
 
@@ -564,7 +576,7 @@ export function DirectorConsole({
                   {qrSrc ? (
                     <img
                       src={qrSrc}
-                      alt={`${r.name}扫码上号二维码`}
+                      alt={`${r.name}扫码绑定二维码`}
                       className="h-full w-full object-contain"
                     />
                   ) : (

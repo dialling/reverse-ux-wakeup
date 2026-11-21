@@ -2,7 +2,7 @@
   "name": "reverse-ux-wakeup",
   "private": true,
   "version": "1.0.0",
-  "description": "《醒醒！分钱了》(Snooze & Lose) — 404寝室早起押金契约逆向UX应用",
+  "description": "《醒醒！分钱了》(Rise & Fine) — 404寝室早起押金契约逆向UX应用",
   "type": "module",
   "scripts": {
     "dev": "vite --host 0.0.0.0",

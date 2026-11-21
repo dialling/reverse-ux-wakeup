@@ -1,11 +1,16 @@
 import React, { useMemo, useState } from 'react';
 import { Columns4, LayoutDashboard, RotateCcw, ShieldCheck, Wifi } from 'lucide-react';
-import { assertMoneyConservation, formatYuan } from '../core/dormEngine';
+import {
+  assertMoneyConservation,
+  DEFAULT_WAKE_TIME,
+  formatYuan,
+} from '../core/dormEngine';
 import { ConnectionStatus, SyncMode, ViewMode } from '../core/syncClient';
 import { DormAction, DormState, ROOMMATE_IDS, RoommateId } from '../types/dorm';
 import { PhoneFrame } from './PhoneFrame';
 import { RoommatePhoneScreen } from './RoommatePhoneScreen';
 import { SettlementModal } from './SettlementModal';
+import { WakeTimePicker } from './WakeTimePicker';
 
 interface SinglePhoneStageProps {
   dormState: DormState;
@@ -32,6 +37,7 @@ export function SinglePhoneStage({
 }: SinglePhoneStageProps) {
   const [showSettlement, setShowSettlement] = useState<boolean>(false);
   const me = dormState.roommates[activeRole];
+  const wakeTime = dormState.targetWakeTime || DEFAULT_WAKE_TIME;
   const conservation = useMemo(
     () => assertMoneyConservation(dormState),
     [dormState]
@@ -52,14 +58,13 @@ export function SinglePhoneStage({
           : 'ledger-grid-bg flex min-h-dvh w-full flex-col items-center justify-center px-4 py-2.5'
       }
     >
-      {/* Ultra-Restrained Semi-Transparent Mini Capsule Bar (Desktop Only) */}
+      {/* Restrained Semi-Transparent Mini Capsule Bar (Desktop Only) */}
       {!isMobileViewport && (
         <div className="mb-2.5 flex flex-wrap items-center justify-center gap-2 rounded-full border border-slate-800/80 bg-slate-950/75 px-3.5 py-1.5 text-[11px] shadow-xl backdrop-blur">
-          <span className="font-black text-[#FACC15]">404纯享Demo</span>
+          <span className="font-black text-[#FACC15]">Rise &amp; Fine · 404个人端</span>
 
           <span className="h-3 w-px bg-slate-800" />
 
-          {/* Subtle Role Switcher Pills */}
           <div className="flex items-center gap-1">
             {ROOMMATE_IDS.map((id) => {
               const r = dormState.roommates[id];
@@ -92,6 +97,18 @@ export function SinglePhoneStage({
 
           <span className="h-3 w-px bg-slate-800" />
 
+          <WakeTimePicker
+            value={wakeTime}
+            onChange={(nextWakeTime) =>
+              onDispatch({
+                type: 'SET_WAKE_TIME',
+                targetWakeTime: nextWakeTime,
+              })
+            }
+            variant="inline"
+            showPresets={false}
+          />
+
           <span className="inline-flex items-center gap-1 font-mono text-[10px] font-bold text-emerald-400">
             <ShieldCheck className="h-3 w-3" />
             {formatYuan(conservation.actualTotalCents)}
@@ -103,7 +120,7 @@ export function SinglePhoneStage({
             }`}
           >
             <Wifi className="h-3 w-3" />
-            {wsConnected ? 'WS实时联机' : '单机引擎'}
+            {wsConnected ? 'WS实时联机' : '本机清算'}
           </span>
 
           <span className="h-3 w-px bg-slate-800" />
@@ -133,12 +150,11 @@ export function SinglePhoneStage({
             className="inline-flex items-center gap-1 rounded-full border border-slate-800 bg-slate-900/90 px-2 py-0.5 text-[10px] font-semibold text-slate-400 hover:border-slate-600 hover:text-white"
           >
             <LayoutDashboard className="h-2.5 w-2.5" />
-            导播台
+            总控台
           </button>
         </div>
       )}
 
-      {/* Single Centered Flagship Phone */}
       <PhoneFrame
         variant={isMobileViewport ? 'fullscreen' : 'default'}
         clock={dormState.currentClock}

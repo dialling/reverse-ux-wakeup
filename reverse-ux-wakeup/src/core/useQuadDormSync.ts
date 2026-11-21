@@ -1,5 +1,5 @@
 import { useCallback, useEffect, useMemo, useRef, useState } from 'react';
-import { dormReducer } from './dormEngine';
+import { DEFAULT_WAKE_TIME, dormReducer } from './dormEngine';
 import { getStoryActById } from './storyActs';
 import { LanServerInfo, parseUrlBootParams } from './syncClient';
 import { DormAction, DormState, ROOMMATE_IDS, RoommateId } from '../types/dorm';
@@ -21,7 +21,6 @@ function buildUniformRoleStates(state: DormState): RoleStateMap {
 export function useQuadDormSync() {
   const boot = useMemo(() => parseUrlBootParams(), []);
 
-  // 默认若 URL 未显式传 ?act=，4机同屏版默认展示第 2 幕（07:00 老张已醒可突袭 + 阿强/小李逃跑滑块 + 阿伟沉睡可拉响闹钟）
   const defaultActId = useMemo(() => {
     if (typeof window !== 'undefined') {
       const p = new URLSearchParams(window.location.search);
@@ -33,8 +32,11 @@ export function useQuadDormSync() {
   }, [boot.initialActId]);
 
   const initialSeedState = useMemo(
-    () => getStoryActById(defaultActId).buildState(),
-    [defaultActId]
+    () =>
+      getStoryActById(defaultActId, boot.initialWakeTime).buildState(
+        boot.initialWakeTime
+      ),
+    [defaultActId, boot.initialWakeTime]
   );
 
   const [phoneStates, setPhoneStates] = useState<RoleStateMap>(() =>
@@ -97,7 +99,6 @@ export function useQuadDormSync() {
     }
   }, [boot.wsPort]);
 
-  // 启动时探测 :5174；若离线则优雅停留在本地共享状态总线（零报错），若在线则由 4 个真实 WS 客户端分别接入
   useEffect(() => {
     let disposed = false;
     let reconnectTimer: number | null = null;
@@ -128,7 +129,6 @@ export function useQuadDormSync() {
 
       if (!info) {
         closeAllSockets();
-        // 若用户未手动锁死 local，每 4s 温和HTTP探测一次以便用户中途开启 start-lan.mjs 后自动连入
         reconnectTimer = window.setTimeout(connectFourPhones, 4000);
         return;
       }
@@ -251,7 +251,6 @@ export function useQuadDormSync() {
     [roleOnline]
   );
 
-  // 从某一部特定手机发起动作：若该手机已连入 WS，走真实服务端广播至其余 3 部手机；否则走本地共享状态总线实时同步 4 部手机
   const dispatchFromPhone = useCallback(
     (sourceRole: RoommateId, action: DormAction) => {
       const ws = wsMapRef.current[sourceRole];
@@ -279,7 +278,6 @@ export function useQuadDormSync() {
         return;
       }
 
-      // 离线/本地总线兜底：4 部手机共享同一内存实时总线，毫秒级四屏同步
       const baseState = localBusRef.current;
       const nextState = dormReducer(baseState, action);
       localBusRef.current = nextState;
@@ -290,7 +288,8 @@ export function useQuadDormSync() {
 
   const jumpAllPhonesToAct = useCallback(
     (actId: number) => {
-      const presetState = getStoryActById(actId).buildState();
+      const currentWake = localBusRef.current.targetWakeTime || DEFAULT_WAKE_TIME;
+      const presetState = getStoryActById(actId, currentWake).buildState(currentWake);
       dispatchFromPhone('zhang', {
         type: 'LOAD_PRESET_STATE',
         presetState,
@@ -303,8 +302,19 @@ export function useQuadDormSync() {
     dispatchFromPhone('zhang', {
       type: 'RESET_DAY',
       clock: '23:30',
+      targetWakeTime: localBusRef.current.targetWakeTime || DEFAULT_WAKE_TIME,
     });
   }, [dispatchFromPhone]);
+
+  const setAllPhonesWakeTime = useCallback(
+    (targetWakeTime: string) => {
+      dispatchFromPhone('zhang', {
+        type: 'SET_WAKE_TIME',
+        targetWakeTime,
+      });
+    },
+    [dispatchFromPhone]
+  );
 
   return {
     phoneStates,
@@ -318,5 +328,6 @@ export function useQuadDormSync() {
     dispatchFromPhone,
     jumpAllPhonesToAct,
     resetAllPhonesDay,
+    setAllPhonesWakeTime,
   };
 }

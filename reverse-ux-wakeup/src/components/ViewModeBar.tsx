@@ -16,7 +16,7 @@ export function ViewModeBar({
   const items: Array<{ id: ViewMode; label: string; icon: React.ReactNode }> = [
     {
       id: 'director',
-      label: compact ? '导播台' : '手机+导播台',
+      label: compact ? '总控台' : '手机+总控台',
       icon: <LayoutDashboard className="h-3 w-3" />,
     },
     {
@@ -26,7 +26,7 @@ export function ViewModeBar({
     },
     {
       id: 'single',
-      label: compact ? '单机纯享' : '单机纯享Demo',
+      label: compact ? '单部手机' : '单部手机视图',
       icon: <Smartphone className="h-3 w-3" />,
     },
   ];

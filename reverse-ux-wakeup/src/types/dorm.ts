@@ -59,6 +59,7 @@ export interface RaidSession {
 
 export type LedgerEntryKind =
   | 'contract_init'
+  | 'wake_time_update'
   | 'slider_slip'
   | 'snooze_tick'
   | 'snooze_fee'
@@ -101,6 +102,7 @@ export interface ToastNotice {
 export interface DormState {
   dormName: string;
   contractTitle: string;
+  targetWakeTime: string;
   targetAlarmClock: string;
   currentClock: string;
   currentActId: number;
@@ -151,7 +153,13 @@ export interface DailySettlementReport {
 }
 
 export type DormAction =
-  | { type: 'RESET_DAY'; initialDepositCents?: number; clock?: string }
+  | {
+      type: 'RESET_DAY';
+      initialDepositCents?: number;
+      clock?: string;
+      targetWakeTime?: string;
+    }
+  | { type: 'SET_WAKE_TIME'; targetWakeTime: string; clock?: string }
   | { type: 'SIGN_CONTRACT'; roommateId: RoommateId; clock?: string }
   | { type: 'SIGN_ALL_AND_START_ALARM'; clock?: string }
   | { type: 'TRIGGER_ALARM'; roommateIds?: RoommateId[]; clock?: string }
@@ -230,5 +238,5 @@ export interface StoryActDefinition {
   subtitle: string;
   pitchCue: string;
   recommendedRole: RoommateId;
-  buildState: () => DormState;
+  buildState: (targetWakeTime?: string) => DormState;
 }

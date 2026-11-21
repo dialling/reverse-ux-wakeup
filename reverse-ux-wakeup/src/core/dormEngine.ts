@@ -14,6 +14,9 @@ import {
   SettlementRow,
 } from '../types/dorm';
 
+export const DEFAULT_WAKE_TIME = '07:00';
+export const QUICK_WAKE_TIMES = ['06:30', '07:00', '07:30', '08:00', '08:30'] as const;
+
 export const DEFAULT_DEPOSIT_CENTS = 5000; // ¥50.00 per roommate
 export const DEFAULT_TOTAL_FUND_CENTS = DEFAULT_DEPOSIT_CENTS * ROOMMATE_IDS.length; // ¥200.00
 export const DEFAULT_SLIP_PENALTY_CENTS = 50; // ¥0.50
@@ -24,6 +27,37 @@ export const DEFAULT_RAID_PENALTY_CENTS = 1000; // ¥10.00
 export const DEFAULT_SLACKER_FORFEIT_CENTS = 1500; // ¥15.00
 export const DEFAULT_RAID_TIME_LIMIT_SEC = 35;
 
+const HHMM_REGEX = /^(?:[01]\d|2[0-3]):[0-5]\d$/;
+
+export function isValidHHMM(value: unknown): value is string {
+  return typeof value === 'string' && HHMM_REGEX.test(value.trim());
+}
+
+export function parseHHMMToMinutes(hhmm: string): number {
+  const normalized = isValidHHMM(hhmm) ? hhmm.trim() : DEFAULT_WAKE_TIME;
+  const [hh, mm] = normalized.split(':').map(Number);
+  return hh * 60 + mm;
+}
+
+/**
+ * 在 `'HH:MM'` 基础上增减 `deltaMinutes` 分钟，自动处理跨小时与跨零点（如 `'07:55' + 8 -> '08:03'`，`'23:55' + 10 -> '00:05'`）。
+ */
+export function addMinutesToHHMM(baseHHMM: string, deltaMinutes: number): string {
+  const baseMins = parseHHMMToMinutes(baseHHMM);
+  const delta = Number.isFinite(deltaMinutes) ? Math.trunc(deltaMinutes) : 0;
+  const wrapped = (((baseMins + delta) % 1440) + 1440) % 1440;
+  const hh = String(Math.floor(wrapped / 60)).padStart(2, '0');
+  const mm = String(wrapped % 60).padStart(2, '0');
+  return `${hh}:${mm}`;
+}
+
+function computeSignedMinuteDelta(clockHHMM: string, baseHHMM: string): number {
+  let delta = parseHHMMToMinutes(clockHHMM) - parseHHMMToMinutes(baseHHMM);
+  if (delta > 720) delta -= 1440;
+  if (delta < -720) delta += 1440;
+  return delta;
+}
+
 export const ROOMMATE_PROFILES: Record<RoommateId, RoommateProfile> = {
   zhang: {
     id: 'zhang',
@@ -32,7 +66,7 @@ export const ROOMMATE_PROFILES: Record<RoommateId, RoommateProfile> = {
     shortName: '老张',
     badgeLabel: '1号床',
     roleTag: '早起狂魔',
-    bio: '06:58 准时睁眼盯盘，最爱发起突袭查岗薅室友早餐鸡腿钱。',
+    bio: '总比闹钟早起两分钟睁眼盯盘，最爱发起突袭查岗薅室友早餐鸡腿钱。',
     accentHex: '#22C55E',
   },
   qiang: {
@@ -41,7 +75,7 @@ export const ROOMMATE_PROFILES: Record<RoommateId, RoommateProfile> = {
     name: '早八阿强',
     shortName: '阿强',
     badgeLabel: '2号床',
-    roleTag: '屡败早八人',
+    roleTag: '屡败早起人',
     bio: '默认主角，深夜立最狠的早起毒誓，清晨打最卑微的认怂长文。',
     accentHex: '#FACC15',
   },
@@ -203,8 +237,16 @@ function cloneState(state: DormState): DormState {
       activeRaids[k as RoommateId] = { ...v };
     }
   }
+  const normalizedWake = isValidHHMM(state.targetWakeTime)
+    ? state.targetWakeTime
+    : isValidHHMM(state.targetAlarmClock)
+      ? state.targetAlarmClock
+      : DEFAULT_WAKE_TIME;
+
   return {
     ...state,
+    targetWakeTime: normalizedWake,
+    targetAlarmClock: normalizedWake,
     roommates,
     activeRaids,
     ledger: [...state.ledger],
@@ -265,12 +307,6 @@ interface PenaltyDistributionOutcome {
   splits: LedgerSplitItem[];
 }
 
-/**
- * 核心扣罚与分红划转：
- * - 自动按扣款人剩余余额截断（绝不穿仓变负数）
- * - 若已有清醒室友：按顺序均分给已清醒室友
- * - 若尚无室友起床：转入 `publicPoolCents` 公共待分奖池，待首位早起者打卡时立即领取
- */
 function applyPenaltyTransfer(
   state: DormState,
   payerId: RoommateId,
@@ -312,9 +348,6 @@ function applyPenaltyTransfer(
   };
 }
 
-/**
- * 当室友完成深度清醒打卡成为 `awake`（或结算日触发）时，若 `publicPoolCents > 0`，立即按规则分配给已清醒室友。
- */
 function distributePublicPoolToAwake(
   state: DormState,
   recipientIds: RoommateId[],
@@ -355,12 +388,16 @@ function distributePublicPoolToAwake(
 export function createInitialDormState(options?: {
   initialDepositCents?: number;
   clock?: string;
+  targetWakeTime?: string;
 }): DormState {
   const deposit =
     options?.initialDepositCents !== undefined
       ? Math.max(100, Math.trunc(options.initialDepositCents))
       : DEFAULT_DEPOSIT_CENTS;
   const clock = options?.clock ?? '23:30';
+  const targetWakeTime = isValidHHMM(options?.targetWakeTime)
+    ? options.targetWakeTime.trim()
+    : DEFAULT_WAKE_TIME;
   const totalFundCents = deposit * ROOMMATE_IDS.length;
 
   const roommates = {} as Record<RoommateId, RoommateState>;
@@ -382,17 +419,18 @@ export function createInitialDormState(options?: {
       raidsLaunched: 0,
       raidsSurvived: 0,
       raidsFailed: 0,
-      lastActionNote: `已缴纳契约押金 ${formatYuan(deposit)}，明早 07:00 准时对赌`,
+      lastActionNote: `已缴纳契约押金 ${formatYuan(deposit)}，明早 ${targetWakeTime} 准时对赌`,
     };
   });
 
   const state: DormState = {
     dormName: '404 寝室',
-    contractTitle: '07:00 铁血早八互坑契约',
-    targetAlarmClock: '07:00',
+    contractTitle: `${targetWakeTime} 铁血早起互坑契约`,
+    targetWakeTime,
+    targetAlarmClock: targetWakeTime,
     currentClock: clock,
     currentActId: 1,
-    actBanner: '第1幕 · 23:30 深夜立毒誓：4人交齐 ¥200.00 押金池，谁赖床谁请全寝吃鸡腿！',
+    actBanner: `23:30 深夜立誓：4人交齐 ${formatYuan(totalFundCents)} 押金池，激活明早 ${targetWakeTime} 早起契约！`,
     totalFundCents,
     publicPoolCents: 0,
     roommates,
@@ -406,7 +444,7 @@ export function createInitialDormState(options?: {
         toIds: [...ROOMMATE_IDS],
         amountCents: totalFundCents,
         headline: `404 寝室早起契约生效 · 总资金池锁定 ${formatYuan(totalFundCents)}`,
-        detail: `老张、阿强、小李、阿伟各投入 ${formatYuan(deposit)}，07:00 准时开启互坑监督。`,
+        detail: `老张、阿强、小李、阿伟各投入 ${formatYuan(deposit)}，${targetWakeTime} 准时开启互坑监督。`,
       },
     ],
     isDaySettled: false,
@@ -414,7 +452,7 @@ export function createInitialDormState(options?: {
     lastToast: {
       id: 'toast-init',
       tone: 'info',
-      message: `404 寝室契约池已锁定 ${formatYuan(totalFundCents)}`,
+      message: `404 寝室契约池已锁定 ${formatYuan(totalFundCents)}（闹钟 ${targetWakeTime}）`,
       amountCents: totalFundCents,
     },
   };
@@ -439,9 +477,18 @@ export function dormReducer(prevState: DormState, action: DormAction): DormState
   assertMoneyConservation(prevState);
 
   if (action.type === 'RESET_DAY') {
+    const preservedWakeTime = isValidHHMM(action.targetWakeTime)
+      ? action.targetWakeTime.trim()
+      : isValidHHMM(prevState.targetWakeTime)
+        ? prevState.targetWakeTime
+        : isValidHHMM(prevState.targetAlarmClock)
+          ? prevState.targetAlarmClock
+          : DEFAULT_WAKE_TIME;
+
     return createInitialDormState({
       initialDepositCents: action.initialDepositCents,
       clock: action.clock ?? '23:30',
+      targetWakeTime: preservedWakeTime,
     });
   }
 
@@ -452,6 +499,81 @@ export function dormReducer(prevState: DormState, action: DormAction): DormState
   }
 
   const next = cloneState(prevState);
+
+  if (action.type === 'SET_WAKE_TIME') {
+    if (!isValidHHMM(action.targetWakeTime)) {
+      assertMoneyConservation(next);
+      return next;
+    }
+
+    const newWake = action.targetWakeTime.trim();
+    const oldWake = next.targetWakeTime;
+    next.targetWakeTime = newWake;
+    next.targetAlarmClock = newWake;
+    next.contractTitle = `${newWake} 铁血早起互坑契约`;
+
+    const isNightStandby =
+      next.currentActId === 1 &&
+      (prevState.currentClock === '23:30' || prevState.currentClock === '23:31');
+
+    if (isNightStandby) {
+      next.currentClock = action.clock && isValidHHMM(action.clock) ? action.clock : prevState.currentClock;
+      next.actBanner = `23:30 深夜立誓：4人交齐 ${formatYuan(next.totalFundCents)} 押金池，激活明早 ${newWake} 早起契约！`;
+      for (const id of ROOMMATE_IDS) {
+        const r = next.roommates[id];
+        if (r.status === 'sleeping') {
+          r.lastActionNote = r.contractSigned
+            ? `已缴纳契约押金 ${formatYuan(r.initialDepositCents)}，明早 ${newWake} 准时对赌`
+            : `${formatYuan(r.initialDepositCents)} 已托管入池，请按下红手印激活明早 ${newWake} 早起契约`;
+        }
+      }
+    } else {
+      const offsetMins = computeSignedMinuteDelta(prevState.currentClock, oldWake);
+      const shiftedClock =
+        action.clock && isValidHHMM(action.clock)
+          ? action.clock
+          : addMinutesToHHMM(newWake, offsetMins);
+      next.currentClock = shiftedClock;
+
+      for (const id of ROOMMATE_IDS) {
+        const r = next.roommates[id];
+        if (r.wakeupTime && isValidHHMM(r.wakeupTime)) {
+          const rDelta = computeSignedMinuteDelta(r.wakeupTime, oldWake);
+          r.wakeupTime = addMinutesToHHMM(newWake, rDelta);
+        }
+        if (r.status === 'sleeping') {
+          r.lastActionNote = `已缴纳契约押金 ${formatYuan(r.initialDepositCents)}，契约闹钟 ${newWake} 随时炸响`;
+        }
+      }
+
+      if (next.actBanner.includes(oldWake)) {
+        next.actBanner = next.actBanner.replaceAll(oldWake, newWake);
+      } else if (next.actBanner.includes(prevState.currentClock)) {
+        next.actBanner = next.actBanner.replaceAll(prevState.currentClock, shiftedClock);
+      } else {
+        next.actBanner = `${shiftedClock} 契约进行中：全寝起床闹钟时间已设定为 ${newWake}！`;
+      }
+    }
+
+    appendLedger(next, {
+      clock: next.currentClock,
+      kind: 'wake_time_update',
+      toIds: [...ROOMMATE_IDS],
+      amountCents: 0,
+      headline: `全寝起床闹钟时间已调整为 ${newWake}`,
+      detail: `404 寝室契约闹钟由 ${oldWake} 更新为 ${newWake}，各床位终端实时同步。`,
+    });
+
+    next.lastToast = {
+      id: `toast-${next.revision}`,
+      tone: 'info',
+      message: `⏰ 全寝起床闹钟时间已调整为 ${newWake}！`,
+    };
+
+    assertMoneyConservation(next);
+    return next;
+  }
+
   const clock =
     'clock' in action && action.clock ? action.clock : next.currentClock;
   next.currentClock = clock;
@@ -460,17 +582,17 @@ export function dormReducer(prevState: DormState, action: DormAction): DormState
     case 'SIGN_CONTRACT': {
       const r = next.roommates[action.roommateId];
       r.contractSigned = true;
-      r.lastActionNote = `${clock} 已按下红手印，押金 ${formatYuan(r.balanceCents)} 锁定生效`;
+      r.lastActionNote = `${clock} 已按下红手印，押金 ${formatYuan(r.balanceCents)} 锁定生效（${next.targetWakeTime} 闹钟）`;
       next.lastToast = {
         id: `toast-${next.revision}`,
         tone: 'success',
-        message: `${r.shortName}已立下 07:00 早起毒誓！`,
+        message: `${r.shortName}已立下 ${next.targetWakeTime} 早起毒誓！`,
       };
       break;
     }
 
     case 'SIGN_ALL_AND_START_ALARM': {
-      const alarmClock = action.clock ?? '07:00';
+      const alarmClock = action.clock ?? next.targetWakeTime;
       next.currentClock = alarmClock;
       next.isDaySettled = false;
       for (const id of ROOMMATE_IDS) {
@@ -484,7 +606,7 @@ export function dormReducer(prevState: DormState, action: DormAction): DormState
       next.lastToast = {
         id: `toast-${next.revision}`,
         tone: 'danger',
-        message: `${alarmClock} 404寝室夺命早八闹钟全面拉响！`,
+        message: `${alarmClock} 404寝室契约闹钟全面拉响！`,
       };
       break;
     }
@@ -506,7 +628,7 @@ export function dormReducer(prevState: DormState, action: DormAction): DormState
         next.lastToast = {
           id: `toast-${next.revision}`,
           tone: 'warning',
-          message: `已拉响 ${triggeredNames.join('、')} 的夺命闹钟！`,
+          message: `已拉响 ${triggeredNames.join('、')} 的 ${next.targetWakeTime} 契约闹钟！`,
         };
       }
       break;
@@ -862,7 +984,6 @@ export function dormReducer(prevState: DormState, action: DormAction): DormState
       target.raidsFailed += 1;
       target.status = 'snoozing';
 
-      // 优先奖励给发起人及已清醒室友；若发起人本身未处于 awake（如导播台强制触发），保底归入发起人或公共池
       const awakeRecipients = getAwakeRoommateIds(next, target.id, raider.id);
       const effectiveRecipients =
         awakeRecipients.length > 0 ? awakeRecipients : [raider.id];
@@ -948,7 +1069,6 @@ export function dormReducer(prevState: DormState, action: DormAction): DormState
           ? Math.max(0, Math.trunc(action.absentPenaltyCents))
           : 1000;
 
-      // 清理进行中的查岗并针对仍未起床且未结算的室友执行缺勤扣罚（若配置 absentPenalty > 0）
       next.activeRaids = {};
 
       for (const id of ROOMMATE_IDS) {
@@ -969,7 +1089,7 @@ export function dormReducer(prevState: DormState, action: DormAction): DormState
                 toPublicPool: outcome.toPublicPool,
                 amountCents: outcome.actualDeductedCents,
                 splits: outcome.splits,
-                headline: `${r.shortName}早八缺勤收官扣罚 · -${formatYuan(outcome.actualDeductedCents)}`,
+                headline: `${r.shortName}早起缺勤收官扣罚 · -${formatYuan(outcome.actualDeductedCents)}`,
                 detail: formatRecipientSummary(next, outcome),
               });
             }
@@ -979,7 +1099,6 @@ export function dormReducer(prevState: DormState, action: DormAction): DormState
         }
       }
 
-      // 若公共奖池仍有留存且存在已清醒室友，收官全额均分
       const awakeIds = getAwakeRoommateIds(next);
       if (next.publicPoolCents > 0 && awakeIds.length > 0) {
         distributePublicPoolToAwake(next, awakeIds, clock, '每日收官清算');
@@ -1017,10 +1136,9 @@ export function buildSettlementReport(state: DormState): DailySettlementReport {
   const rows: SettlementRow[] = ROOMMATE_IDS.map((id) => {
     const r = state.roommates[id];
     const netProfitCents = r.balanceCents - r.initialDepositCents;
-    // 按食堂卤鸡腿 ¥5.00/个 折算直观体感
     const chickenDrumstickEquivalent = Number((netProfitCents / 500).toFixed(1));
 
-    let verdictTitle = '精准保本早八人';
+    let verdictTitle = '精准保本早起人';
     let verdictTagTone: SettlementRow['verdictTagTone'] = 'neutral';
 
     if (netProfitCents >= 800) {

@@ -1,14 +1,16 @@
 import { describe, expect, it } from 'vitest';
 import {
+  addMinutesToHHMM,
   assertMoneyConservation,
   buildSettlementReport,
   createInitialDormState,
   dormReducer,
   formatSignedYuan,
   formatYuan,
+  isValidHHMM,
   splitCentsExact,
 } from './dormEngine';
-import { STORY_ACTS } from './storyActs';
+import { getStoryActsForWakeTime, STORY_ACTS } from './storyActs';
 import { DormAction, ROOMMATE_IDS, RoommateId } from '../types/dorm';
 
 describe('404 Dorm Money Conservation Engine', () => {
@@ -285,7 +287,12 @@ describe('404 Dorm Money Conservation Engine', () => {
           };
           break;
         default:
-          action = step % 250 === 0 ? { type: 'RESET_DAY' } : { type: 'CANCEL_SNOOZE_TYPER', roommateId: r1 };
+          action =
+            step % 250 === 0
+              ? { type: 'RESET_DAY' }
+              : step % 37 === 0
+                ? { type: 'SET_WAKE_TIME', targetWakeTime: '08:15' }
+                : { type: 'CANCEL_SNOOZE_TYPER', roommateId: r1 };
           break;
       }
 
@@ -294,5 +301,59 @@ describe('404 Dorm Money Conservation Engine', () => {
       expect(report.valid).toBe(true);
       expect(report.actualTotalCents).toBe(20000);
     }
+  });
+
+  it('computes addMinutesToHHMM across hours/midnight and supports custom SET_WAKE_TIME + RESET_DAY preservation', () => {
+    expect(isValidHHMM('07:00')).toBe(true);
+    expect(isValidHHMM('08:15')).toBe(true);
+    expect(isValidHHMM('23:59')).toBe(true);
+    expect(isValidHHMM('24:00')).toBe(false);
+    expect(isValidHHMM('7:00')).toBe(false);
+
+    expect(addMinutesToHHMM('07:55', 8)).toBe('08:03');
+    expect(addMinutesToHHMM('23:55', 8)).toBe('00:03');
+    expect(addMinutesToHHMM('00:02', -5)).toBe('23:57');
+
+    // 1) Nighttime standby SET_WAKE_TIME keeps 23:30 clock, updates targetWakeTime, logs ledger
+    let s = createInitialDormState();
+    expect(s.targetWakeTime).toBe('07:00');
+
+    s = dormReducer(s, { type: 'SET_WAKE_TIME', targetWakeTime: '08:15' });
+    expect(s.targetWakeTime).toBe('08:15');
+    expect(s.targetAlarmClock).toBe('08:15');
+    expect(s.currentClock).toBe('23:30');
+    expect(s.ledger[0].headline).toContain('全寝起床闹钟时间已调整为 08:15');
+    assertMoneyConservation(s);
+
+    // 2) Triggering alarm uses custom wake time 08:15; shifting wake time during morning shifts clock offset
+    s = dormReducer(s, { type: 'SIGN_ALL_AND_START_ALARM' });
+    expect(s.currentClock).toBe('08:15');
+    s = dormReducer(s, {
+      type: 'COMPLETE_STAGE1_SLIDER',
+      roommateId: 'zhang',
+      clock: '08:19',
+    });
+    expect(s.currentClock).toBe('08:19'); // +4 min offset relative to 08:15
+
+    s = dormReducer(s, { type: 'SET_WAKE_TIME', targetWakeTime: '06:45' });
+    expect(s.targetWakeTime).toBe('06:45');
+    expect(s.currentClock).toBe('06:49'); // preserves +4 min offset!
+    assertMoneyConservation(s);
+
+    // 3) RESET_DAY preserves user-selected targetWakeTime ('06:45')
+    s = dormReducer(s, { type: 'RESET_DAY' });
+    expect(s.targetWakeTime).toBe('06:45');
+    expect(s.currentClock).toBe('23:30');
+    expect(s.roommates.qiang.lastActionNote).toContain('06:45');
+
+    // 4) Dynamic story acts follow targetWakeTime
+    const customActs = getStoryActsForWakeTime('07:55');
+    expect(customActs.map((a) => a.clock)).toEqual([
+      '23:30',
+      '07:55',
+      '07:57',
+      '07:59',
+      '08:03',
+    ]);
   });
 });

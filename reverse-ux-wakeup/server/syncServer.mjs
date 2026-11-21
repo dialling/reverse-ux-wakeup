@@ -7,6 +7,21 @@ const SYNC_PORT = Number(process.env.SYNC_PORT || process.env.PORT || 5174);
 const SYNC_HOST = process.env.SYNC_HOST || '0.0.0.0';
 const DEFAULT_WEB_PORT = Number(process.env.WEB_PORT || 5173);
 const ROOMMATE_IDS = ['zhang', 'qiang', 'li', 'wei'];
+const HHMM_REGEX = /^(?:[01]\d|2[0-3]):[0-5]\d$/;
+
+function normalizeDormStatePayload(state) {
+  const wakeTime =
+    typeof state.targetWakeTime === 'string' && HHMM_REGEX.test(state.targetWakeTime)
+      ? state.targetWakeTime
+      : typeof state.targetAlarmClock === 'string' && HHMM_REGEX.test(state.targetAlarmClock)
+        ? state.targetAlarmClock
+        : '07:00';
+  return {
+    ...state,
+    targetWakeTime: wakeTime,
+    targetAlarmClock: wakeTime,
+  };
+}
 
 function detectLanIpv4List() {
   const nets = os.networkInterfaces();
@@ -36,6 +51,12 @@ function detectLanIpv4List() {
 function validateDormStateConservation(state) {
   if (!state || typeof state !== 'object') {
     throw new Error('Invalid state payload');
+  }
+  if (
+    state.targetWakeTime !== undefined &&
+    (typeof state.targetWakeTime !== 'string' || !HHMM_REGEX.test(state.targetWakeTime))
+  ) {
+    throw new Error(`Invalid targetWakeTime format: ${state.targetWakeTime}`);
   }
   if (!Number.isSafeInteger(state.totalFundCents) || state.totalFundCents <= 0) {
     throw new Error(`Invalid totalFundCents: ${state.totalFundCents}`);
@@ -147,8 +168,10 @@ const server = http.createServer((req, res) => {
     sendJson(res, 200, {
       ok: true,
       service: 'reverse-ux-wakeup-sync',
+      brand: 'Rise & Fine',
       syncPort: SYNC_PORT,
       hasState: Boolean(sharedDormState),
+      targetWakeTime: sharedDormState?.targetWakeTime ?? '07:00',
       revision: sharedDormState?.revision ?? 0,
       ...buildPresenceSummary(),
     });
@@ -207,9 +230,10 @@ wss.on('connection', (ws) => {
       if (!sharedDormState && msg.initialState) {
         try {
           validateDormStateConservation(msg.initialState);
+          const normalized = normalizeDormStatePayload(msg.initialState);
           sharedDormState = {
-            ...msg.initialState,
-            revision: Math.max(1, Number(msg.initialState.revision || 1)),
+            ...normalized,
+            revision: Math.max(1, Number(normalized.revision || 1)),
           };
         } catch (err) {
           ws.send(
@@ -267,8 +291,9 @@ wss.on('connection', (ws) => {
         baseRevision === sharedDormState.revision
       ) {
         const nextRevision = (sharedDormState ? sharedDormState.revision : 0) + 1;
+        const normalized = normalizeDormStatePayload(nextState);
         sharedDormState = {
-          ...nextState,
+          ...normalized,
           revision: nextRevision,
         };
         const meta = clients.get(ws);
@@ -303,7 +328,7 @@ wss.on('connection', (ws) => {
 server.listen(SYNC_PORT, SYNC_HOST, () => {
   const info = buildLanInfo(DEFAULT_WEB_PORT);
   console.log(
-    `[404寝室联机同步台] HTTP + WebSocket 已启动: http://${info.primaryLanIp}:${SYNC_PORT}`
+    `[醒醒！分钱了 Rise & Fine · 联机同步台] HTTP + WebSocket 已启动: http://${info.primaryLanIp}:${SYNC_PORT}`
   );
   console.log(
     `[局域网扫码基址] 探测到本机 IPv4: ${info.lanIps.join(', ')} | 扫码信息接口: http://localhost:${SYNC_PORT}/api/lan-info`

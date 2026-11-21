@@ -1,0 +1,990 @@
+<!DOCTYPE html>
+<!--
+  ==========================================================================
+  Rise & Fine (《醒醒！分钱了》) — CrossPointX 2026 Reverse UX Challenge Poster (English Edition)
+  Canvas: 1200 × 1800 px (2:3 Competition Vertical Poster, 100% Vector CSS & Inline SVG)
+  Pipeline: Dify Workflow (deepseek-v4-pro) Draft + Engineering Visual Refinement
+  ==========================================================================
+-->
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=1200, initial-scale=1.0" />
+  <title>Rise &amp; Fine (《醒醒！分钱了》) — Reverse UX Challenge Poster</title>
+  <style>
+    :root {
+      --yellow: #FACC15;
+      --yellow-soft: #FEF9C3;
+      --red: #EF4444;
+      --red-dark: #B91C1C;
+      --slate: #0F172A;
+      --ink: #090D16;
+      --paper: #FAF7F0;
+      --card-bg: #FFFFFF;
+      --green: #16A34A;
+      --green-soft: #DCFCE7;
+      --blue: #2563EB;
+      --sans: 'Inter', -apple-system, BlinkMacSystemFont, 'Segoe UI', 'Helvetica Neue', Arial, 'PingFang SC', sans-serif;
+      --mono: 'JetBrains Mono', 'SFMono-Regular', 'Menlo', 'Monaco', 'Consolas', monospace;
+    }
+
+    @page {
+      size: 1200px 1800px;
+      margin: 0;
+    }
+
+    * {
+      margin: 0;
+      padding: 0;
+      box-sizing: border-box;
+      -webkit-print-color-adjust: exact !important;
+      print-color-adjust: exact !important;
+    }
+
+    html, body {
+      width: 1200px;
+      height: 1800px;
+      margin: 0;
+      padding: 0;
+      background: var(--paper);
+      font-family: var(--sans);
+      color: var(--slate);
+      overflow: hidden;
+      -webkit-font-smoothing: antialiased;
+    }
+
+    .poster {
+      width: 1200px;
+      height: 1800px;
+      position: relative;
+      display: flex;
+      flex-direction: column;
+      justify-content: space-between;
+      background-color: var(--paper);
+      background-image:
+        linear-gradient(to right, rgba(15, 23, 42, 0.055) 1px, transparent 1px),
+        linear-gradient(to bottom, rgba(15, 23, 42, 0.055) 1px, transparent 1px);
+      background-size: 30px 30px;
+      border-left: 8px solid var(--ink);
+      border-right: 8px solid var(--ink);
+      overflow: hidden;
+    }
+
+    .hazard-bar {
+      width: 100%;
+      height: 20px;
+      flex-shrink: 0;
+      background: repeating-linear-gradient(
+        -45deg,
+        var(--yellow) 0px,
+        var(--yellow) 22px,
+        var(--ink) 22px,
+        var(--ink) 44px
+      );
+      border-bottom: 4px solid var(--ink);
+    }
+    .hazard-bar.bottom {
+      border-bottom: none;
+      border-top: 4px solid var(--ink);
+    }
+
+    .canvas-body {
+      flex: 1;
+      padding: 20px 34px;
+      display: flex;
+      flex-direction: column;
+      justify-content: space-between;
+      gap: 12px;
+      position: relative;
+      z-index: 2;
+    }
+
+    /* ==================== 1. TOP BAR ==================== */
+    .top-bar {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      background: var(--slate);
+      color: #FFFFFF;
+      border: 4px solid var(--ink);
+      box-shadow: 6px 6px 0 var(--red);
+      padding: 9px 16px;
+      height: 52px;
+    }
+    .top-bar-left {
+      display: flex;
+      align-items: center;
+      gap: 12px;
+      font-size: 15.5px;
+      font-weight: 900;
+      letter-spacing: 0.2px;
+    }
+    .track-pill {
+      background: var(--yellow);
+      color: var(--ink);
+      padding: 3px 10px;
+      border: 2px solid var(--ink);
+      font-family: var(--mono);
+      font-size: 13px;
+      font-weight: 900;
+      white-space: nowrap;
+    }
+    .top-bar-right {
+      font-family: var(--mono);
+      font-size: 13.5px;
+      font-weight: 800;
+      color: var(--yellow);
+      background: rgba(250, 204, 21, 0.12);
+      border: 1.5px solid var(--yellow);
+      padding: 4px 12px;
+      letter-spacing: 0.8px;
+      white-space: nowrap;
+    }
+
+    /* ==================== 2. HERO SECTION ==================== */
+    .hero-section {
+      display: grid;
+      grid-template-columns: 1fr 296px;
+      gap: 22px;
+      align-items: stretch;
+    }
+    .hero-left {
+      display: flex;
+      flex-direction: column;
+      justify-content: space-between;
+    }
+    .kicker-row {
+      display: flex;
+      gap: 10px;
+      align-items: center;
+      margin-bottom: 4px;
+    }
+    .kicker-tag {
+      background: var(--yellow);
+      color: var(--ink);
+      border: 3px solid var(--ink);
+      box-shadow: 3px 3px 0 var(--ink);
+      padding: 4px 11px;
+      font-size: 13px;
+      font-weight: 900;
+      letter-spacing: 0.1px;
+      white-space: nowrap;
+    }
+    .kicker-tag.red {
+      background: var(--red);
+      color: #FFFFFF;
+    }
+    .kicker-tag.dark {
+      background: var(--slate);
+      color: var(--yellow);
+    }
+
+    .title-lockup {
+      display: flex;
+      align-items: center;
+      gap: 18px;
+      margin: 4px 0 8px;
+    }
+    .main-title {
+      font-size: 82px;
+      font-weight: 950;
+      line-height: 1.0;
+      letter-spacing: -2.5px;
+      color: var(--ink);
+      text-shadow: 5px 5px 0 var(--yellow), 10px 10px 0 var(--red);
+      white-space: nowrap;
+    }
+    .en-stamp {
+      background: var(--ink);
+      color: var(--yellow);
+      border: 4px solid var(--ink);
+      box-shadow: 5px 5px 0 var(--red);
+      padding: 7px 14px;
+      font-family: var(--sans);
+      font-size: 21px;
+      font-weight: 900;
+      line-height: 1.15;
+      letter-spacing: 0.5px;
+      transform: rotate(-2.5deg);
+      text-align: center;
+      white-space: nowrap;
+    }
+    .en-stamp small {
+      display: block;
+      font-family: var(--mono);
+      font-size: 11px;
+      color: #FFFFFF;
+      letter-spacing: 1.6px;
+      margin-top: 3px;
+    }
+
+    .slogan-box {
+      background: var(--red);
+      color: #FFFFFF;
+      border: 4px solid var(--ink);
+      box-shadow: 7px 7px 0 var(--ink);
+      padding: 12px 18px;
+      position: relative;
+      margin-bottom: 10px;
+    }
+    .slogan-main {
+      font-size: 21px;
+      font-weight: 950;
+      letter-spacing: -0.3px;
+      text-shadow: 2.5px 2.5px 0 var(--ink);
+      line-height: 1.22;
+    }
+    .slogan-sub {
+      margin-top: 5px;
+      font-size: 13.5px;
+      font-weight: 800;
+      color: var(--yellow-soft);
+      letter-spacing: 0.1px;
+    }
+
+    .thesis-strip {
+      background: #FFFFFF;
+      border: 3.5px solid var(--ink);
+      border-left: 12px solid var(--yellow);
+      box-shadow: 5px 5px 0 var(--ink);
+      padding: 10px 15px;
+      font-size: 13.5px;
+      line-height: 1.44;
+      font-weight: 700;
+      color: var(--slate);
+    }
+    .thesis-strip strong {
+      background: var(--yellow-soft);
+      padding: 0 4px;
+      color: var(--ink);
+      font-weight: 900;
+    }
+
+    .hero-phone-card {
+      background: var(--slate);
+      border: 4px solid var(--ink);
+      box-shadow: 8px 8px 0 var(--yellow);
+      border-radius: 22px;
+      padding: 10px;
+      display: flex;
+      flex-direction: column;
+      justify-content: space-between;
+    }
+
+    /* ==================== SECTION HEADERS ==================== */
+    .section-header {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      gap: 12px;
+      margin-bottom: 9px;
+    }
+    .section-badge {
+      background: var(--ink);
+      color: var(--yellow);
+      border: 3.5px solid var(--ink);
+      box-shadow: 5px 5px 0 var(--red);
+      padding: 6px 14px;
+      font-size: 17px;
+      font-weight: 900;
+      letter-spacing: 0.2px;
+      display: inline-flex;
+      align-items: center;
+      gap: 10px;
+      white-space: nowrap;
+    }
+    .section-badge .num {
+      background: var(--red);
+      color: #FFFFFF;
+      font-family: var(--mono);
+      font-size: 13px;
+      padding: 2px 7px;
+      border: 2px solid var(--yellow);
+    }
+    .section-note {
+      font-size: 12.5px;
+      font-weight: 900;
+      color: var(--ink);
+      background: var(--yellow);
+      border: 3px solid var(--ink);
+      box-shadow: 3px 3px 0 var(--ink);
+      padding: 5px 11px;
+      white-space: nowrap;
+    }
+
+    /* ==================== 3. LOOP 01 ==================== */
+    .loop-grid {
+      display: grid;
+      grid-template-columns: 726px 1fr;
+      gap: 18px;
+      align-items: stretch;
+    }
+    .loop-diagram-card {
+      background: #FFFFFF;
+      border: 4px solid var(--ink);
+      box-shadow: 7px 7px 0 var(--ink);
+      padding: 10px 12px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+    }
+    .pillars-card {
+      background: var(--slate);
+      color: #FFFFFF;
+      border: 4px solid var(--ink);
+      box-shadow: 7px 7px 0 var(--red);
+      padding: 12px 15px;
+      display: flex;
+      flex-direction: column;
+      justify-content: space-between;
+    }
+    .pillar-item {
+      border-bottom: 1.5px dashed rgba(250, 204, 21, 0.35);
+      padding-bottom: 8px;
+    }
+    .pillar-item:last-of-type {
+      border-bottom: none;
+      padding-bottom: 0;
+    }
+    .pillar-head {
+      display: flex;
+      align-items: center;
+      gap: 8px;
+      font-size: 15px;
+      font-weight: 900;
+      color: var(--yellow);
+      margin-bottom: 3px;
+    }
+    .pillar-head span {
+      background: var(--red);
+      color: #FFFFFF;
+      font-family: var(--mono);
+      font-size: 11.5px;
+      padding: 1px 6px;
+      border: 1.5px solid #FFFFFF;
+      flex-shrink: 0;
+    }
+    .pillar-desc {
+      font-size: 12px;
+      line-height: 1.36;
+      color: #E2E8F0;
+      font-weight: 600;
+    }
+    .invariant-banner {
+      background: rgba(250, 204, 21, 0.14);
+      border: 2px solid var(--yellow);
+      padding: 7px 10px;
+      text-align: center;
+      font-family: var(--mono);
+      font-size: 12.5px;
+      font-weight: 900;
+      color: var(--yellow);
+    }
+
+    /* ==================== 4. ANTI-UX × 5 BENTO ==================== */
+    .mech-top-row {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 14px;
+      margin-bottom: 12px;
+    }
+    .mech-bottom-row {
+      display: grid;
+      grid-template-columns: repeat(3, 1fr);
+      gap: 14px;
+    }
+    .mech-card {
+      background: var(--card-bg);
+      border: 4px solid var(--ink);
+      box-shadow: 6px 6px 0 var(--ink);
+      padding: 11px 13px;
+      display: flex;
+      flex-direction: column;
+      justify-content: space-between;
+      position: relative;
+    }
+    .mech-card.wide {
+      display: grid;
+      grid-template-columns: 196px 1fr;
+      gap: 13px;
+      align-items: center;
+    }
+    .mech-visual {
+      background: var(--paper);
+      border: 3px solid var(--ink);
+      height: 100%;
+      min-height: 122px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      overflow: hidden;
+    }
+    .mech-card:not(.wide) .mech-visual {
+      height: 108px;
+      margin-bottom: 7px;
+    }
+    .mech-head {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      gap: 6px;
+      margin-bottom: 5px;
+    }
+    .mech-title {
+      font-size: 15.5px;
+      font-weight: 900;
+      color: var(--ink);
+      line-height: 1.18;
+      letter-spacing: -0.2px;
+    }
+    .mech-idx {
+      background: var(--red);
+      color: #FFFFFF;
+      font-family: var(--mono);
+      font-size: 11.5px;
+      font-weight: 900;
+      padding: 2px 6px;
+      border: 2px solid var(--ink);
+      flex-shrink: 0;
+    }
+    .mech-pain {
+      font-size: 12px;
+      line-height: 1.36;
+      color: #1E293B;
+      font-weight: 600;
+      margin-bottom: 6px;
+    }
+    .mech-pass {
+      background: var(--green-soft);
+      border: 2px solid var(--ink);
+      color: #14532D;
+      font-size: 11.2px;
+      font-weight: 800;
+      padding: 4px 7px;
+      line-height: 1.28;
+    }
+
+    /* ==================== 5. FOOTER ==================== */
+    .footer-grid {
+      display: grid;
+      grid-template-columns: 1fr 376px;
+      gap: 18px;
+      align-items: stretch;
+    }
+    .eng-box {
+      background: var(--slate);
+      color: #FFFFFF;
+      border: 4px solid var(--ink);
+      box-shadow: 6px 6px 0 var(--yellow);
+      padding: 12px 16px;
+      display: flex;
+      flex-direction: column;
+      justify-content: space-between;
+    }
+    .eng-title-row {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      border-bottom: 2px solid rgba(250, 204, 21, 0.35);
+      padding-bottom: 7px;
+      margin-bottom: 7px;
+    }
+    .eng-title {
+      font-size: 15.5px;
+      font-weight: 900;
+      color: var(--yellow);
+      letter-spacing: 0.1px;
+    }
+    .dify-tag {
+      font-family: var(--mono);
+      font-size: 11px;
+      font-weight: 800;
+      background: rgba(239, 68, 68, 0.22);
+      color: #FCA5A5;
+      border: 1.5px solid var(--red);
+      padding: 2px 8px;
+      white-space: nowrap;
+    }
+    .eng-badges {
+      display: grid;
+      grid-template-columns: repeat(3, 1fr);
+      gap: 10px;
+    }
+    .eng-item {
+      background: rgba(255, 255, 255, 0.06);
+      border: 1.5px solid rgba(250, 204, 21, 0.45);
+      padding: 7px 9px;
+    }
+    .eng-item strong {
+      display: block;
+      font-size: 12.5px;
+      color: var(--yellow);
+      margin-bottom: 3px;
+      font-weight: 900;
+    }
+    .eng-item p {
+      font-size: 11px;
+      line-height: 1.32;
+      color: #CBD5E1;
+      font-weight: 600;
+    }
+
+    .lan-box {
+      background: var(--yellow);
+      border: 4px solid var(--ink);
+      box-shadow: 6px 6px 0 var(--red);
+      padding: 11px 13px;
+      display: flex;
+      align-items: center;
+      gap: 13px;
+    }
+    .qr-card {
+      width: 110px;
+      height: 110px;
+      background: #FFFFFF;
+      border: 3.5px solid var(--ink);
+      box-shadow: 3px 3px 0 var(--ink);
+      padding: 6px;
+      flex-shrink: 0;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+    }
+    .lan-copy h4 {
+      font-size: 15.5px;
+      font-weight: 900;
+      color: var(--ink);
+      line-height: 1.2;
+      margin-bottom: 4px;
+    }
+    .lan-copy p {
+      font-size: 11.5px;
+      font-weight: 700;
+      color: var(--slate);
+      line-height: 1.34;
+      margin-bottom: 6px;
+    }
+    .lan-pill {
+      display: inline-block;
+      background: var(--ink);
+      color: var(--yellow);
+      font-family: var(--mono);
+      font-size: 10.8px;
+      font-weight: 900;
+      padding: 3px 8px;
+      white-space: nowrap;
+    }
+  </style>
+</head>
+<body>
+  <div class="poster">
+    <div class="hazard-bar"></div>
+
+    <div class="canvas-body">
+      <!-- ==================== 1. TOP COMPETITION BAR ==================== -->
+      <header class="top-bar">
+        <div class="top-bar-left">
+          <span class="track-pill">REVERSE UX CHALLENGE</span>
+          <span>Design an App Users Hate, Yet Have No Choice But to Use</span>
+        </div>
+        <div class="top-bar-right">DORM-404 · 07:00 AM</div>
+      </header>
+
+      <!-- ==================== 2. HERO TITLE + LIVE PHONE MOCKUP ==================== -->
+      <section class="hero-section">
+        <div class="hero-left">
+          <div>
+            <div class="kicker-row">
+              <span class="kicker-tag">Voluntary Masochism Pact</span>
+              <span class="kicker-tag red">4-Roommate Tight Binding</span>
+              <span class="kicker-tag dark">Hatred = Alertness</span>
+            </div>
+
+            <div class="title-lockup">
+              <h1 class="main-title">RISE &amp; FINE</h1>
+              <div class="en-stamp">
+                醒醒！分钱了
+                <small>ROOM 404 · ANTI-UX</small>
+              </div>
+            </div>
+          </div>
+
+          <div class="slogan-box">
+            <div class="slogan-main">“Every snoozed minute buys drumsticks for your roommates!”</div>
+            <div class="slogan-sub">Curse it at 07:00 AM, yet willingly lock ¥50 deposit every night at 23:30!</div>
+          </div>
+
+          <div class="thesis-strip">
+            Smooth “slide-to-stop” alarms indulge half-asleep <strong>muscle-memory dismissal</strong>. Rise &amp; Fine pairs <strong>5 anti-muscle-memory gauntlets + a 4-roommate zero-sum flywheel</strong> to turn snoozing into your upper bunk's breakfast — <strong>zero cold-start traffic needed!</strong>
+          </div>
+        </div>
+
+        <!-- Right Phone Mockup -->
+        <div class="hero-phone-card">
+          <svg viewBox="0 0 268 308" width="100%" height="100%" xmlns="http://www.w3.org/2000/svg">
+            <rect x="4" y="4" width="260" height="300" rx="16" fill="#090D16" stroke="#FACC15" stroke-width="3"/>
+            <rect x="96" y="10" width="76" height="14" rx="7" fill="#1E293B"/>
+            <text x="16" y="21" fill="#FACC15" font-family="monospace" font-size="9.2" font-weight="900">ROOM 404·BED 2</text>
+            <circle cx="208" cy="17" r="4" fill="#EF4444"/>
+            <text x="217" y="21" fill="#EF4444" font-family="monospace" font-size="10" font-weight="900">LIVE</text>
+            <!-- Red Alarm Card -->
+            <rect x="14" y="30" width="240" height="86" rx="8" fill="#EF4444" stroke="#090D16" stroke-width="3"/>
+            <text x="134" y="49" fill="#FEF9C3" font-family="monospace" font-size="10" font-weight="900" text-anchor="middle">[!] 07:00 DORM PACT ALARM [!]</text>
+            <text x="134" y="88" fill="#FFFFFF" font-family="monospace" font-size="40" font-weight="900" text-anchor="middle">07:00:08</text>
+            <text x="134" y="107" fill="#090D16" font-size="10.8" font-weight="900" text-anchor="middle">8-AM Qiang · Balance ¥47.00</text>
+            <!-- Auto-bleed Toast -->
+            <rect x="14" y="124" width="240" height="34" rx="6" fill="#FACC15" stroke="#090D16" stroke-width="2.5"/>
+            <text x="134" y="145" fill="#090D16" font-size="10.2" font-weight="900" text-anchor="middle">Hesitated 10s! Auto-bled -¥1.00 to Zhang</text>
+            <!-- Evasive Slider Track -->
+            <rect x="14" y="166" width="240" height="72" rx="8" fill="#1E293B" stroke="#FACC15" stroke-width="2"/>
+            <rect x="22" y="175" width="128" height="18" rx="4" fill="#FACC15"/>
+            <text x="86" y="188" fill="#090D16" font-size="9.5" font-weight="900" text-anchor="middle">STEP 1 Safety Pin 0.8s</text>
+            <text x="202" y="188" fill="#94A3B8" font-family="monospace" font-size="9.2" font-weight="800" text-anchor="middle">9.8G Snapback</text>
+            <rect x="24" y="201" width="220" height="26" rx="13" fill="#090D16" stroke="#475569" stroke-width="2"/>
+            <path d="M98 214 L42 214" stroke="#EF4444" stroke-width="2.5" stroke-dasharray="4 3"/>
+            <polygon points="36,214 45,209 45,219" fill="#EF4444"/>
+            <circle cx="176" cy="214" r="11.5" fill="#EF4444" stroke="#FFFFFF" stroke-width="2"/>
+            <text x="176" y="217" fill="#FFFFFF" font-family="monospace" font-size="6.6" font-weight="900" text-anchor="middle">DODGE</text>
+            <!-- Snooze Trap Button -->
+            <rect x="14" y="247" width="240" height="44" rx="8" fill="#0F172A" stroke="#EF4444" stroke-width="2.5" stroke-dasharray="6 3"/>
+            <text x="134" y="265" fill="#FCA5A5" font-size="10.2" font-weight="900" text-anchor="middle">Snooze 5m? Type 40-char confession</text>
+            <text x="134" y="282" fill="#FACC15" font-family="monospace" font-size="9.2" font-weight="800" text-anchor="middle">(No Paste · 1 typo wipes all)</text>
+          </svg>
+        </div>
+      </section>
+
+      <!-- ==================== 3. LOOP 01: ¥200 ZERO-SUM POOL ==================== -->
+      <section>
+        <div class="section-header">
+          <div class="section-badge">
+            <span class="num">LOOP 01</span>
+            <span>Voluntary Pact × 4-Roommate Binding × ¥200 Zero-Sum Pool</span>
+          </div>
+          <div class="section-note">Zero Platform Cut · Peer Pressure Lock-In</div>
+        </div>
+
+        <div class="loop-grid">
+          <div class="loop-diagram-card">
+            <svg viewBox="0 0 700 308" width="100%" height="100%" xmlns="http://www.w3.org/2000/svg">
+              <defs>
+                <marker id="arr-red" markerWidth="9" markerHeight="9" refX="7" refY="4.5" orient="auto">
+                  <path d="M0,0 L9,4.5 L0,9 Z" fill="#EF4444"/>
+                </marker>
+                <marker id="arr-green" markerWidth="9" markerHeight="9" refX="7" refY="4.5" orient="auto">
+                  <path d="M0,0 L9,4.5 L0,9 Z" fill="#16A34A"/>
+                </marker>
+              </defs>
+
+              <rect x="4" y="4" width="692" height="300" rx="8" fill="#FAF7F0" stroke="#090D16" stroke-width="2.5"/>
+
+              <!-- Raid Dashed Line (Zhang -> Li) -->
+              <path d="M100 98 L100 194" stroke="#0F172A" stroke-width="3" stroke-dasharray="5 4" marker-end="url(#arr-red)"/>
+              <rect x="34" y="135" width="132" height="24" rx="4" fill="#FACC15" stroke="#090D16" stroke-width="2"/>
+              <text x="100" y="151" font-size="10.5" font-weight="900" fill="#090D16" text-anchor="middle">07:01 Ambush Raid</text>
+
+              <!-- 4 Money Flow Vectors -->
+              <path d="M268 118 L194 66" stroke="#16A34A" stroke-width="4" marker-end="url(#arr-green)"/>
+              <path d="M512 66 L434 118" stroke="#EF4444" stroke-width="4" stroke-dasharray="7 4" marker-end="url(#arr-red)"/>
+              <path d="M268 174 L194 226" stroke="#16A34A" stroke-width="4" marker-end="url(#arr-green)"/>
+              <path d="M512 226 L434 174" stroke="#EF4444" stroke-width="4" stroke-dasharray="7 4" marker-end="url(#arr-red)"/>
+
+              <!-- Center 404 Closed Pact Pool -->
+              <rect x="266" y="92" width="168" height="112" rx="12" fill="#FACC15" stroke="#090D16" stroke-width="4"/>
+              <rect x="272" y="80" width="156" height="22" rx="5" fill="#090D16"/>
+              <text x="350" y="95" font-family="monospace" font-size="10.2" font-weight="900" fill="#FACC15" text-anchor="middle">404 CLOSED PACT POOL</text>
+              <text x="350" y="142" font-family="monospace" font-size="32" font-weight="900" fill="#090D16" text-anchor="middle">¥200.00</text>
+              <text x="350" y="164" font-family="monospace" font-size="10.5" font-weight="900" fill="#B91C1C" text-anchor="middle">4 × ¥50.00 / 20,000¢</text>
+              <text x="350" y="186" font-size="10.5" font-weight="800" fill="#0F172A" text-anchor="middle">Awake Split · Sleepers Pay</text>
+
+              <!-- 4 Non-Overlapping Delta Pills -->
+              <rect x="190" y="34" width="84" height="22" rx="4" fill="#DCFCE7" stroke="#16A34A" stroke-width="2"/>
+              <text x="232" y="49" font-size="9.8" font-weight="900" fill="#14532D" text-anchor="middle">Jackpot +¥6.5</text>
+
+              <rect x="426" y="34" width="84" height="22" rx="4" fill="#FEE2E2" stroke="#EF4444" stroke-width="2"/>
+              <text x="468" y="49" font-size="9.8" font-weight="900" fill="#991B1B" text-anchor="middle">Bleed -¥3.0</text>
+
+              <rect x="190" y="232" width="84" height="22" rx="4" fill="#DCFCE7" stroke="#16A34A" stroke-width="2"/>
+              <text x="232" y="247" font-size="9.8" font-weight="900" fill="#14532D" text-anchor="middle">Survived +¥6.5</text>
+
+              <rect x="426" y="232" width="84" height="22" rx="4" fill="#FEE2E2" stroke="#EF4444" stroke-width="2"/>
+              <text x="468" y="247" font-size="9.8" font-weight="900" fill="#991B1B" text-anchor="middle">Breached -¥10</text>
+
+              <!-- Bed 1: Grinder Zhang -->
+              <rect x="14" y="16" width="174" height="80" rx="8" fill="#0F172A" stroke="#090D16" stroke-width="3.5"/>
+              <rect x="22" y="25" width="70" height="20" rx="4" fill="#16A34A"/>
+              <text x="57" y="39" font-family="monospace" font-size="9.8" font-weight="900" fill="#FFFFFF" text-anchor="middle">BED 1·AWAKE</text>
+              <text x="144" y="40" font-family="monospace" font-size="12.2" font-weight="900" fill="#4ADE80" text-anchor="middle">¥56.50 ↑</text>
+              <text x="22" y="64" font-size="14.5" font-weight="900" fill="#FACC15">Grinder Zhang</text>
+              <text x="22" y="82" font-size="10.2" font-weight="700" fill="#CBD5E1">06:58 Clear · Raid Harvester</text>
+
+              <!-- Bed 2: 8-AM Qiang -->
+              <rect x="512" y="16" width="174" height="80" rx="8" fill="#FFFFFF" stroke="#090D16" stroke-width="3.5"/>
+              <rect x="520" y="25" width="70" height="20" rx="4" fill="#FACC15" stroke="#090D16" stroke-width="1.5"/>
+              <text x="555" y="39" font-family="monospace" font-size="9.8" font-weight="900" fill="#090D16" text-anchor="middle">BED 2·BLED</text>
+              <text x="642" y="40" font-family="monospace" font-size="12.2" font-weight="900" fill="#EF4444" text-anchor="middle">¥47.00 ↓</text>
+              <text x="520" y="64" font-size="14.5" font-weight="900" fill="#090D16">8-AM Qiang</text>
+              <text x="520" y="82" font-size="10.2" font-weight="700" fill="#475569">Shame-typer typo &amp; bleed</text>
+
+              <!-- Bed 3: Relapse Li -->
+              <rect x="14" y="198" width="174" height="82" rx="8" fill="#FFFFFF" stroke="#090D16" stroke-width="3.5"/>
+              <rect x="22" y="207" width="74" height="20" rx="4" fill="#2563EB"/>
+              <text x="59" y="221" font-family="monospace" font-size="9.5" font-weight="900" fill="#FFFFFF" text-anchor="middle">BED 3·CLUTCH</text>
+              <text x="144" y="222" font-family="monospace" font-size="12.2" font-weight="900" fill="#16A34A" text-anchor="middle">¥56.50 ↑</text>
+              <text x="22" y="246" font-size="14.5" font-weight="900" fill="#090D16">Relapse Li</text>
+              <text x="22" y="265" font-size="10.2" font-weight="700" fill="#475569">Wire + Jam + Raid clutch</text>
+
+              <!-- Bed 4: Coma Wei -->
+              <rect x="512" y="198" width="174" height="82" rx="8" fill="#FEF2F2" stroke="#EF4444" stroke-width="3.5"/>
+              <rect x="520" y="207" width="72" height="20" rx="4" fill="#EF4444"/>
+              <text x="556" y="221" font-family="monospace" font-size="9.8" font-weight="900" fill="#FFFFFF" text-anchor="middle">BED 4·COMA</text>
+              <text x="642" y="222" font-family="monospace" font-size="12.2" font-weight="900" fill="#B91C1C" text-anchor="middle">¥40.00 ↓</text>
+              <text x="520" y="246" font-size="14.5" font-weight="900" fill="#991B1B">Coma Wei</text>
+              <text x="520" y="265" font-size="10.2" font-weight="800" fill="#B91C1C">Chief Drumstick Sponsor</text>
+
+              <!-- Bottom Conservation Check -->
+              <rect x="192" y="264" width="316" height="30" rx="6" fill="#090D16"/>
+              <text x="350" y="283" font-family="monospace" font-size="11.5" font-weight="900" fill="#4ADE80" text-anchor="middle">✓ 56.50 + 47.00 + 56.50 + 40.00 ≡ ¥200.00</text>
+            </svg>
+          </div>
+
+          <!-- Right 3 Pillars -->
+          <div class="pillars-card">
+            <div class="pillar-item">
+              <div class="pillar-head"><span>01</span> Zero-Cold-Start Flywheel</div>
+              <p class="pillar-desc">Ditches million-DAU stranger pools for 4 roommates in one physical room — everyone hears the alarm; quitters buy bubble tea.</p>
+            </div>
+            <div class="pillar-item">
+              <div class="pillar-head"><span>02</span> More Hatred = Wider Awake</div>
+              <p class="pillar-desc">Kills eyes-closed muscle memory! Dodging sliders, wipe-on-typo &amp; shuffled math force your prefrontal cortex online.</p>
+            </div>
+            <div class="pillar-item">
+              <div class="pillar-head"><span>03</span> 10× Instant Loss Aversion</div>
+              <p class="pillar-desc">Losing ¥5 to a platform feels abstract; watching your ¥5 buy extra drumsticks for Zhang across the room stings 10× harder.</p>
+            </div>
+            <div class="invariant-banner">
+              ∑ balanceCents + poolCents ≡ 20,000¢
+            </div>
+          </div>
+        </div>
+      </section>
+
+      <!-- ==================== 4. ANTI-UX × 5 GAUNTLETS ==================== -->
+      <section>
+        <div class="section-header">
+          <div class="section-badge">
+            <span class="num">ANTI-UX × 5</span>
+            <span>Five Maddening Yet 100% Deterministically Solvable Gauntlets</span>
+          </div>
+          <div class="section-note">Hostile Friction ≠ Bugs · Proven Solvable</div>
+        </div>
+
+        <!-- Top 2 Wide Cards -->
+        <div class="mech-top-row">
+          <!-- Stage 01 -->
+          <article class="mech-card wide">
+            <div class="mech-visual">
+              <svg viewBox="0 0 190 126" width="100%" height="100%" xmlns="http://www.w3.org/2000/svg">
+                <rect x="8" y="12" width="174" height="24" rx="5" fill="#FACC15" stroke="#090D16" stroke-width="2.5"/>
+                <text x="95" y="28" font-size="10.2" font-weight="900" fill="#090D16" text-anchor="middle">[LOCK] Safety Pin Hold 0.8s</text>
+                <rect x="10" y="50" width="170" height="34" rx="17" fill="#0F172A" stroke="#090D16" stroke-width="2.5"/>
+                <path d="M98 67 L28 67" stroke="#EF4444" stroke-width="3" stroke-dasharray="5 3"/>
+                <polygon points="24,67 34,61 34,73" fill="#EF4444"/>
+                <circle cx="138" cy="67" r="14" fill="#EF4444" stroke="#FFFFFF" stroke-width="2.5"/>
+                <text x="138" y="70.5" font-family="monospace" font-size="8" font-weight="900" fill="#FFFFFF" text-anchor="middle">DODGE</text>
+                <text x="95" y="108" font-size="10" font-weight="900" fill="#B91C1C" text-anchor="middle">Release = 9.8G Gravity Snapback</text>
+              </svg>
+            </div>
+            <div>
+              <div class="mech-head">
+                <h3 class="mech-title">Evasive Slider + 9.8G Snapback</h3>
+                <span class="mech-idx">01</span>
+              </div>
+              <p class="mech-pain">Touch without unlocking and the thumb dodges &amp; taunts; fling too fast and it derails; let go mid-track for an instant 9.8G reset to zero.</p>
+              <div class="mech-pass">✓ Clear: Hold pin 0.8s → steady 1.5–3s slide → hold end 0.5s</div>
+            </div>
+          </article>
+
+          <!-- Stage 02 -->
+          <article class="mech-card wide">
+            <div class="mech-visual">
+              <svg viewBox="0 0 190 126" width="100%" height="100%" xmlns="http://www.w3.org/2000/svg">
+                <rect x="10" y="10" width="84" height="24" rx="4" fill="#FEE2E2" stroke="#EF4444" stroke-width="2"/>
+                <text x="52" y="26" font-family="monospace" font-size="10.5" font-weight="900" fill="#B91C1C" text-anchor="middle">NO Ctrl+V</text>
+                <rect x="100" y="10" width="80" height="24" rx="4" fill="#090D16"/>
+                <text x="140" y="26" font-family="monospace" font-size="10.8" font-weight="900" fill="#FACC15" text-anchor="middle">-¥1 / 10s</text>
+                <rect x="10" y="42" width="170" height="48" rx="6" fill="#FFFFFF" stroke="#090D16" stroke-width="2.5"/>
+                <text x="16" y="60" font-size="9.5" font-weight="800" fill="#16A34A">“I admit I'm the laziest in</text>
+                <text x="16" y="78" font-size="9.5" font-weight="800" fill="#EF4444">Room 404...” ← 1 Typo!</text>
+                <rect x="10" y="96" width="170" height="22" rx="4" fill="#EF4444"/>
+                <text x="95" y="111" font-size="9.8" font-weight="900" fill="#FFFFFF" text-anchor="middle">× 1 Typo Wipes Whole Text!</text>
+              </svg>
+            </div>
+            <div>
+              <div class="mech-head">
+                <h3 class="mech-title">Paste-Blocked Shame Typer</h3>
+                <span class="mech-idx">02</span>
+              </div>
+              <p class="mech-pain">Want 5m snooze? Paste is blocked (attempts swap in a harsher confession), 1 typo wipes all text, and every 10s hesitation bleeds -¥1!</p>
+              <div class="mech-pass">✓ Clear: Type highlighted confession char-by-char cleanly</div>
+            </div>
+          </article>
+        </div>
+
+        <!-- Bottom 3 Column Cards -->
+        <div class="mech-bottom-row">
+          <!-- Stage 03 -->
+          <article class="mech-card">
+            <div>
+              <div class="mech-visual">
+                <svg viewBox="0 0 310 108" width="100%" height="100%" xmlns="http://www.w3.org/2000/svg">
+                  <rect x="12" y="12" width="132" height="84" rx="8" fill="#0F172A" stroke="#090D16" stroke-width="2.5"/>
+                  <text x="78" y="34" font-family="monospace" font-size="10.2" font-weight="900" fill="#EF4444" text-anchor="middle">[!] ¥10 RAID</text>
+                  <text x="78" y="60" font-family="monospace" font-size="17" font-weight="900" fill="#FACC15" text-anchor="middle">37 × 3 - 19</text>
+                  <text x="78" y="81" font-size="9.5" font-weight="800" fill="#CBD5E1" text-anchor="middle">0–9 Reshuffles/Tap</text>
+                  <g transform="translate(158, 10) rotate(-4 68 44)">
+                    <rect x="0" y="0" width="42" height="26" rx="4" fill="#FACC15" stroke="#090D16" stroke-width="2"/>
+                    <text x="21" y="18" font-family="monospace" font-size="14" font-weight="900" text-anchor="middle">7</text>
+                    <rect x="47" y="0" width="42" height="26" rx="4" fill="#FFFFFF" stroke="#090D16" stroke-width="2"/>
+                    <text x="68" y="18" font-family="monospace" font-size="14" font-weight="900" text-anchor="middle">2</text>
+                    <rect x="94" y="0" width="42" height="26" rx="4" fill="#FACC15" stroke="#090D16" stroke-width="2"/>
+                    <text x="115" y="18" font-family="monospace" font-size="14" font-weight="900" text-anchor="middle">9</text>
+                    <rect x="0" y="31" width="42" height="26" rx="4" fill="#FFFFFF" stroke="#090D16" stroke-width="2"/>
+                    <text x="21" y="49" font-family="monospace" font-size="14" font-weight="900" text-anchor="middle">0</text>
+                    <rect x="47" y="31" width="42" height="26" rx="4" fill="#EF4444" stroke="#090D16" stroke-width="2"/>
+                    <text x="68" y="49" font-family="monospace" font-size="14" font-weight="900" fill="#FFF" text-anchor="middle">5</text>
+                    <rect x="94" y="31" width="42" height="26" rx="4" fill="#FFFFFF" stroke="#090D16" stroke-width="2"/>
+                    <text x="115" y="49" font-family="monospace" font-size="14" font-weight="900" text-anchor="middle">1</text>
+                    <rect x="0" y="62" width="136" height="24" rx="4" fill="#090D16"/>
+                    <text x="68" y="78" font-size="9.5" font-weight="900" fill="#FACC15" text-anchor="middle">⇄ Sine-Sway Shuffled Pad</text>
+                  </g>
+                </svg>
+              </div>
+              <div class="mech-head">
+                <h3 class="mech-title">Ambush Raid + Shuffled Math</h3>
+                <span class="mech-idx">03</span>
+              </div>
+              <p class="mech-pain">Awake roommates launch ¥10 ambush raids! The sine-swaying keypad reshuffles digits 0–9 on every tap — zero blind typing.</p>
+            </div>
+            <div class="mech-pass">✓ Solve 2 equations in a row to survive &amp; keep deposit</div>
+          </article>
+
+          <!-- Stage 04 -->
+          <article class="mech-card">
+            <div>
+              <div class="mech-visual">
+                <svg viewBox="0 0 310 108" width="100%" height="100%" xmlns="http://www.w3.org/2000/svg">
+                  <g transform="translate(22, 8)">
+                    <rect x="0" y="0" width="124" height="92" fill="#0F172A" stroke="#090D16" stroke-width="2.5" rx="6"/>
+                    <path d="M31 0 V92 M62 0 V92 M93 0 V92 M0 23 H124 M0 46 H124 M0 69 H124" stroke="#334155" stroke-width="1"/>
+                    <path d="M15 12 H108 V35" fill="none" stroke="#FACC15" stroke-width="5" stroke-linecap="round" stroke-linejoin="round"/>
+                    <circle cx="15" cy="12" r="6" fill="#FACC15"/><circle cx="108" cy="35" r="6" fill="#FACC15"/>
+                    <path d="M15 80 H108 V58" fill="none" stroke="#4ADE80" stroke-width="5" stroke-linecap="round" stroke-linejoin="round"/>
+                    <circle cx="15" cy="80" r="6" fill="#4ADE80"/><circle cx="108" cy="58" r="6" fill="#4ADE80"/>
+                    <path d="M46 12 V58 H78" fill="none" stroke="#EF4444" stroke-width="5" stroke-dasharray="5 3" stroke-linecap="round"/>
+                    <circle cx="46" cy="12" r="6" fill="#EF4444"/><circle cx="78" cy="58" r="6" fill="#EF4444"/>
+                  </g>
+                  <rect x="158" y="16" width="138" height="76" rx="6" fill="#FEF2F2" stroke="#EF4444" stroke-width="2.5"/>
+                  <text x="227" y="38" font-size="10.8" font-weight="900" fill="#B91C1C" text-anchor="middle">[!] SHORT CIRCUIT!</text>
+                  <text x="227" y="57" font-size="9.8" font-weight="800" fill="#1E293B" text-anchor="middle">Both wires blow (-¥0.50)</text>
+                  <text x="227" y="76" font-family="monospace" font-size="10.5" font-weight="900" fill="#16A34A" text-anchor="middle">30–60s Focus Exam</text>
+                </svg>
+              </div>
+              <div class="mech-head">
+                <h3 class="mech-title">30–60s High-Voltage Flow</h3>
+                <span class="mech-idx">04</span>
+              </div>
+              <p class="mech-pain">Link matching nodes on 5×5 / 6×6 grids without crossing; touching another color blows both lines &amp; fines ¥0.50.</p>
+            </div>
+            <div class="mech-pass">✓ DFS solver-verified: 100% deterministically solvable</div>
+          </article>
+
+          <!-- Stage 05 -->
+          <article class="mech-card">
+            <div>
+              <div class="mech-visual">
+                <svg viewBox="0 0 310 108" width="100%" height="100%" xmlns="http://www.w3.org/2000/svg">
+                  <g transform="translate(18, 8)">
+                    <rect x="0" y="0" width="136" height="92" rx="6" fill="#E2E8F0" stroke="#090D16" stroke-width="2.5"/>
+                    <rect x="130" y="32" width="10" height="26" fill="#16A34A"/>
+                    <rect x="10" y="10" width="52" height="18" rx="4" fill="#3B82F6" stroke="#090D16" stroke-width="2"/>
+                    <rect x="82" y="10" width="20" height="50" rx="4" fill="#FACC15" stroke="#090D16" stroke-width="2"/>
+                    <rect x="108" y="44" width="20" height="38" rx="4" fill="#64748B" stroke="#090D16" stroke-width="2"/>
+                    <rect x="16" y="35" width="58" height="22" rx="5" fill="#EF4444" stroke="#090D16" stroke-width="2.5"/>
+                    <text x="45" y="50" font-family="monospace" font-size="9.5" font-weight="900" fill="#FFFFFF" text-anchor="middle">HERO ▶</text>
+                    <rect x="28" y="66" width="48" height="18" rx="4" fill="#10B981" stroke="#090D16" stroke-width="2"/>
+                  </g>
+                  <rect x="166" y="16" width="130" height="76" rx="6" fill="#FFFBEB" stroke="#090D16" stroke-width="2.5"/>
+                  <text x="231" y="38" font-size="10.5" font-weight="900" fill="#090D16" text-anchor="middle">▲ ZERO SCRAPES!</text>
+                  <text x="231" y="57" font-size="9.3" font-weight="800" fill="#B91C1C" text-anchor="middle">Scrape resets (-¥0.50)</text>
+                  <text x="231" y="76" font-family="monospace" font-size="10.2" font-weight="900" fill="#16A34A" text-anchor="middle">10–14 Optimal Moves</text>
+                </svg>
+              </div>
+              <div class="mech-head">
+                <h3 class="mech-title">30–60s Zero-Scrape Jam</h3>
+                <span class="mech-idx">05</span>
+              </div>
+              <p class="mech-pain">Slide blocking scooters on a 6×6 lot to escort the red scooter out EXIT; any scrape snaps it back to origin &amp; fines ¥0.50!</p>
+            </div>
+            <div class="mech-pass">✓ BFS shortest-path verified (10–14 optimal moves)</div>
+          </article>
+        </div>
+      </section>
+
+      <!-- ==================== 5. ENGINEERING & LAN QR FOOTER ==================== -->
+      <footer class="footer-grid">
+        <div class="eng-box">
+          <div class="eng-title-row">
+            <span class="eng-title">⚙ Hardcore Engineering · Never Fake Anti-UX with Bugs</span>
+            <span class="dify-tag">Dify Workflow × Visual Polish</span>
+          </div>
+          <div class="eng-badges">
+            <div class="eng-item">
+              <strong>Exact-Cent Conservation</strong>
+              <p>Integer-cent state machine + runtime assertions guarantee ¥200.00 zero-leakage balance.</p>
+            </div>
+            <div class="eng-item">
+              <strong>DFS / BFS Solvability Proofs</strong>
+              <p>Every Flow &amp; Scooter puzzle passes automated solver tests — 100% solvable in 30–60s.</p>
+            </div>
+            <div class="eng-item">
+              <strong>4-Phone Sync &amp; Standalone</strong>
+              <p>Supports 4-phone live wall, Dorm-404 console, and real-phone WebSocket LAN QR play.</p>
+            </div>
+          </div>
+        </div>
+
+        <div class="lan-box">
+          <div class="qr-card">
+            <svg viewBox="0 0 100 100" width="94" height="94" xmlns="http://www.w3.org/2000/svg">
+              <rect width="100" height="100" fill="#FFFFFF"/>
+              <path d="M8,8 h26 v26 h-26 z M13,13 v16 h16 v-16 z M17,17 h8 v8 h-8 z" fill="#090D16"/>
+              <path d="M66,8 h26 v26 h-26 z M71,13 v16 h16 v-16 z M75,17 h8 v8 h-8 z" fill="#090D16"/>
+              <path d="M8,66 h26 v26 h-26 z M13,71 v16 h16 v-16 z M17,75 h8 v8 h-8 z" fill="#090D16"/>
+              <g fill="#090D16">
+                <rect x="40" y="10" width="6" height="6"/><rect x="52" y="10" width="8" height="6"/>
+                <rect x="40" y="22" width="12" height="6"/><rect x="56" y="22" width="6" height="12"/>
+                <rect x="10" y="40" width="12" height="6"/><rect x="28" y="40" width="6" height="12"/>
+                <rect x="10" y="52" width="6" height="8"/><rect x="20" y="54" width="10" height="6"/>
+                <rect x="68" y="40" width="10" height="6"/><rect x="84" y="40" width="8" height="12"/>
+                <rect x="70" y="54" width="14" height="6"/><rect x="42" y="68" width="12" height="6"/>
+                <rect x="60" y="68" width="8" height="10"/><rect x="74" y="68" width="18" height="6"/>
+                <rect x="40" y="80" width="8" height="12"/><rect x="54" y="84" width="16" height="8"/>
+                <rect x="76" y="78" width="8" height="14"/><rect x="86" y="84" width="6" height="8"/>
+              </g>
+              <rect x="36" y="36" width="28" height="28" rx="4" fill="#EF4444" stroke="#090D16" stroke-width="3"/>
+              <text x="50" y="54" font-family="monospace" font-size="12" font-weight="900" fill="#FFFFFF" text-anchor="middle">404</text>
+            </svg>
+          </div>
+          <div class="lan-copy">
+            <h4>Multi-Phone LAN QR Sync</h4>
+            <p>Open Dorm-404 Console on desktop; scan bed QR codes on phones to join &amp; launch live raids!</p>
+            <span class="lan-pill">HTTP + WebSocket Real-Time Sync</span>
+          </div>
+        </div>
+      </footer>
+    </div>
+
+    <div class="hazard-bar bottom"></div>
+  </div>
+</body>
+</html>
