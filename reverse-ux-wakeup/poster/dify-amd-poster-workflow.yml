@@ -1,0 +1,244 @@
+app:
+  description: '逆向 UX 挑战赛参赛作品《醒醒！分钱了》(Snooze & Lose) 赛事宣传海报 SVG/HTML 结构化视觉生成工作流（基于 AMD Free Token Factory 插件模型驱动）'
+  icon: '⏰'
+  icon_background: '#FFD600'
+  icon_type: emoji
+  mode: workflow
+  name: '醒醒！分钱了 · 逆向UX海报生成器 (AMD Free Token Factory)'
+  use_icon_as_answer_icon: false
+dependencies:
+  - current_identifier: null
+    type: marketplace
+    value:
+      marketplace_plugin_unique_identifier: amdtokenfactory/amdtokenfactory:0.0.30@8fb5286a4919a7df41229927f1093d8b65d50a9f3036bf1aa9b7baa22ed72490
+      version: null
+kind: app
+version: '0.1.5'
+workflow:
+  conversation_variables: []
+  environment_variables: []
+  features:
+    file_upload:
+      allowed_file_extensions:
+        - .JPG
+        - .JPEG
+        - .PNG
+        - .GIF
+        - .WEBP
+        - .SVG
+      allowed_file_types:
+        - image
+      allowed_file_upload_methods:
+        - local_file
+        - remote_url
+      enabled: false
+      fileUploadConfig:
+        audio_file_size_limit: 50
+        batch_count_limit: 5
+        file_size_limit: 15
+        image_file_size_limit: 10
+        video_file_size_limit: 100
+        workflow_file_upload_limit: 10
+      image:
+        enabled: false
+        number_limits: 3
+        transfer_methods:
+          - local_file
+          - remote_url
+      number_limits: 3
+    opening_statement: ''
+    retriever_resource:
+      enabled: false
+    sensitive_word_avoidance:
+      enabled: false
+    speech_to_text:
+      enabled: false
+    suggested_questions: []
+    suggested_questions_after_answer:
+      enabled: false
+    text_to_speech:
+      enabled: false
+      language: ''
+      voice: ''
+  graph:
+    edges:
+      - data:
+          isInIteration: false
+          isInLoop: false
+          sourceType: start
+          targetType: llm
+        id: 1732160000001-source-1732160000002-target
+        selected: false
+        source: '1732160000001'
+        sourceHandle: source
+        target: '1732160000002'
+        targetHandle: target
+        type: custom
+        zIndex: 0
+      - data:
+          isInIteration: false
+          isInLoop: false
+          sourceType: llm
+          targetType: end
+        id: 1732160000002-source-1732160000003-target
+        selected: false
+        source: '1732160000002'
+        sourceHandle: source
+        target: '1732160000003'
+        targetHandle: target
+        type: custom
+        zIndex: 0
+    nodes:
+      - data:
+          desc: '输入海报主题参数（留空即默认采用《醒醒！分钱了》404寝室标准赛事设定，支持一键直接运行）'
+          selected: false
+          title: '海报创意参数输入'
+          type: start
+          variables:
+            - label: '应用主标题 (留空默认《醒醒！分钱了》Snooze & Lose)'
+              max_length: 120
+              options: []
+              required: false
+              type: text-input
+              variable: app_title
+            - label: '核心宣传口号 (留空默认：你多睡的每一分钟，都在给室友加鸡腿)'
+              max_length: 200
+              options: []
+              required: false
+              type: text-input
+              variable: core_slogan
+            - label: '视觉风格指令 (留空默认：警戒黄+刺眼早八红+工业黑契约账本风)'
+              max_length: 200
+              options: []
+              required: false
+              type: text-input
+              variable: visual_style
+            - label: '补充赛事卖点说明 (可选)'
+              max_length: 2000
+              options: []
+              required: false
+              type: paragraph
+              variable: extra_notes
+        height: 168
+        id: '1732160000001'
+        position:
+          x: 80
+          y: 240
+        positionAbsolute:
+          x: 80
+          y: 240
+        selected: false
+        sourcePosition: right
+        targetPosition: left
+        type: custom
+        width: 244
+      - data:
+          context:
+            enabled: false
+            variable_selector: []
+          desc: '调用 AMD Free Token Factory 开源大模型直接输出完整可渲染的 1200x1800 赛事竖版 HTML+SVG 海报源码'
+          memory:
+            query_prompt_template: ''
+            role_prefix:
+              assistant: ''
+              user: ''
+            window:
+              enabled: false
+              size: 10
+          model:
+            completion_params:
+              max_tokens: 8192
+              temperature: 0.55
+            mode: chat
+            name: Qwen3.8-27B
+            provider: amdtokenfactory/amdtokenfactory/amdtokenfactory
+          prompt_template:
+            - id: 8c61d510-4040-4a27-9001-000000000001
+              role: system
+              text: |
+                你是一位顶尖的赛事视觉艺术总监与前端 SVG/HTML 海报排版工程师。
+                请为【逆向 UX 挑战赛（主题：设计一款用户讨厌但又不得不用的 APP）】参赛作品《醒醒！分钱了》(Snooze & Lose) 生成一份完整、独立、零外部图片依赖、可直接在浏览器渲染并二次编辑的高清竖版宣传海报 HTML5 源码（画布尺寸固定为 `width: 1200px; height: 1800px`，内嵌矢量 `<svg>` 插画与高冲击力现代 CSS 网格排版）。
+
+                ### 必须精准呈现的核心视觉与文案要素：
+                1. **视觉主色调与气质**：
+                   - 采用高反差「防爆警戒黄 (`#FFD600`) + 刺眼早八红 (`#FF2E2E`) + 工业契约黑 (`#0D0E12`) + 票据米白 (`#FAF7F0`)」新粗野主义（Neo-Brutalism）契约账本风格，带斜向黄黑警戒条纹、醒目粗黑描边阴影与印章质感。
+                2. **顶部赛事角标与爆款主视觉标题**：
+                   - 顶部角标：`REVERSE UX CHALLENGE · 逆向 UX 挑战赛参赛作品`
+                   - 超大主标题：`醒醒！分钱了` + 英文副标 `SNOOZE & LOSE`
+                   - 核心洗脑口号横幅：**“你多睡的每一分钟，都在给室友加鸡腿！”**
+                   - 副文案点题：“一款让你每天早上7点恨到咬牙切齿，但为了保住 ¥50 早餐押金又绝不敢卸载的 4 人寝室早起契约 APP。”
+                3. **中段核心机制一：404 寝室 ¥200 押金内循环流转图解（使用内嵌 `<svg>` 绘制清晰信息图）**：
+                   - 展示 404 寝室四人角色闭环（零外部流量即可冷启动）：
+                     - `1号床·卷王老张`（06:58 清醒 · 发起突袭查岗 · 狂分鸡腿红包）
+                     - `2号床·早八阿强`（贪睡打错字破防 · 押金滴血外流）
+                     - `3号床·回笼觉小李`（眯眼回被窝 · 被连线与挪车精准拦截）
+                     - `4号床·死睡阿伟`（重度赖床户 · 寝室早餐基金最大慈善家）
+                   - 突出核心公式：`∑ 室友余额 + 在途契约池 ≡ ¥200.00（确定性状态机严格资金守恒）`
+                4. **中下段核心机制二：五大“折磨级但 100% 可通关”逆向 UX 交互卡片矩阵**：
+                   - `[01] 躲避手指滑块 + 松手急速倒退`：盲扑瞬间反向闪避，松手指数级重力归零，0.8s 安全阀解锁专治脊髓反射。
+                   - `[02] 禁粘贴手打社死认怂长文`：封死复制粘贴，45字羞耻宣言错一字整段清空，犹豫每 10 秒滴血扣 ¥1 给室友。
+                   - `[03] 室友突袭查岗 + 晃动乱序键盘算术`：老张一键跨端查岗，摇摆键盘每按一键 0-9 瞬间洗牌，杜绝肌肉记忆。
+                   - `[04] 30-60s 同色小球不交叉连线`：高密度网格路径规划，异色误碰立即蜂鸣弹回，独立回溯求解器验证必可解。
+                   - `[05] 30-60s 无碰撞挪车出库`：6×6 寝室楼下车位零擦碰容忍，追尾即震动扣时，BFS 最短步数验证绝不误课。
+                5. **底部行动号召与技术溯源栏**：
+                   - 左侧：`双模架构 · 桌面 404 上帝导播台 + 局域网真机扫码实时互坑`（配矢量二维码示意框与“扫码加入 404 契约局”提示）。
+                   - 右侧徽章：`讨厌度 = 清醒度` · `Generated via Dify Workflow × AMD Free Token Factory`。
+
+                ### 输出格式硬性要求：
+                - **只输出完整可直接保存为 `.html` 的代码**（从 `<!DOCTYPE html>` 开始到 `</html>` 结束），不要用多余解释文字包裹，确保排版紧凑饱满、无文字溢出画布、中英文与等宽数字层次分明。
+            - id: 8c61d510-4040-4a27-9001-000000000002
+              role: user
+              text: |
+                请立即生成《醒醒！分钱了》(Snooze & Lose) 1200x1800 参赛宣传海报的完整独立 HTML+SVG 源码：
+                - 指定主标题覆盖（若为空则用默认）：{{#1732160000001.app_title#}}
+                - 指定核心口号覆盖（若为空则用默认）：{{#1732160000001.core_slogan#}}
+                - 指定视觉风格覆盖（若为空则用默认）：{{#1732160000001.visual_style#}}
+                - 补充卖点说明（若有）：{{#1732160000001.extra_notes#}}
+
+                请确保包含完整的内联 `<style>` 与矢量 `<svg>` 图形组件（警报钟表/逃跑滑块/4人押金流转图/五大逆向关卡图标/扫码框），直接返回从 `<!DOCTYPE html>` 到 `</html>` 的完整代码。
+          selected: false
+          title: 'AMD Free Token Factory 海报生成'
+          type: llm
+          variables: []
+          vision:
+            enabled: false
+        height: 98
+        id: '1732160000002'
+        position:
+          x: 400
+          y: 240
+        positionAbsolute:
+          x: 400
+          y: 240
+        selected: false
+        sourcePosition: right
+        targetPosition: left
+        type: custom
+        width: 244
+      - data:
+          desc: '输出生成的完整 HTML/SVG 海报源码，可直接保存为 HTML 并在浏览器渲染导出 PNG/PDF'
+          outputs:
+            - value_selector:
+                - '1732160000002'
+                - text
+              variable: poster_html
+          selected: false
+          title: '输出海报 HTML/SVG 源码'
+          type: end
+        height: 90
+        id: '1732160000003'
+        position:
+          x: 720
+          y: 240
+        positionAbsolute:
+          x: 720
+          y: 240
+        selected: false
+        sourcePosition: right
+        targetPosition: left
+        type: custom
+        width: 244
+    viewport:
+      x: 0
+      y: 0
+      zoom: 0.9
