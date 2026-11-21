@@ -4,9 +4,4 @@ dist/
 *.log
 .env
 .env.*
-
-# 本地构建中间产物 / 大文件归档 / 工具私有目录
-宣传视频/build/*.mp4
-宣传视频/build/*.wav
 *.zip
-.workbuddy-ai/

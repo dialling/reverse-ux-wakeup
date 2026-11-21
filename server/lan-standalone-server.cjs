@@ -3931,6 +3931,9 @@ async function listenWithFallback(server, host, preferredPort, excludePorts = /*
 }
 function findFallbackStandaloneHtml() {
   const candidates = [
+    import_node_path.default.resolve(APP_ROOT, "醒醒分钱了-寝室总控台版.html"),
+    import_node_path.default.resolve(APP_ROOT, "醒醒分钱了-单部手机版.html"),
+    import_node_path.default.resolve(APP_ROOT, "醒醒分钱了-4部联机手机同屏版.html"),
     import_node_path.default.resolve(APP_ROOT, "..", "\u9192\u9192\u5206\u94B1\u4E86-\u5BDD\u5BA4\u603B\u63A7\u53F0\u7248.html"),
     import_node_path.default.resolve(APP_ROOT, "..", "..", "\u9192\u9192\u5206\u94B1\u4E86-\u5BDD\u5BA4\u603B\u63A7\u53F0\u7248.html"),
     import_node_path.default.resolve(APP_ROOT, "..", "\u9192\u9192\u5206\u94B1\u4E86-4\u90E8\u8054\u673A\u624B\u673A\u540C\u5C4F\u7248.html"),
